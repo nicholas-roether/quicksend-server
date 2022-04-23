@@ -1,0 +1,18 @@
+{
+   "version": "2.0.0",
+   "tasks": [
+      {
+         "label": "Compile typescript",
+         "type": "shell",
+         "command": "yarn tsc -p tsconfig.json",
+         "presentation": {
+            "echo": true,
+            "reveal": "silent",
+            "focus": false,
+            "panel": "shared",
+            "showReuseMessage": false,
+            "clear": true
+         }
+      }
+   ]
+}
