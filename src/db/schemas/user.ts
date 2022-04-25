@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { DeviceModel } from "../models";
+import DeviceModel from "../models/device";
 
 interface User {
 	username: string;
@@ -9,11 +9,11 @@ interface User {
 }
 
 const UserSchema = new mongoose.Schema<User>({
-	username: { type: String, required: true, unique: true },
+	username: { type: String, required: true, unique: true, index: true },
 	display: String,
 	passwordHash: { type: String, required: true },
 	devices: {
-		type: mongoose.SchemaTypes.ObjectId,
+		type: [mongoose.SchemaTypes.ObjectId],
 		default: [],
 		ref: DeviceModel
 	}

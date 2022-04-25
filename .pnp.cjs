@@ -34,16 +34,19 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./",\
           "packageDependencies": [\
             ["@koa/router", "npm:10.1.1"],\
+            ["@types/bcryptjs", "npm:2.4.2"],\
             ["@types/koa", "npm:2.13.4"],\
             ["@types/koa-bodyparser", "npm:4.3.7"],\
             ["@types/koa__router", "npm:8.0.11"],\
             ["@types/node", "npm:17.0.25"],\
             ["@typescript-eslint/eslint-plugin", "virtual:3f21ca9c8a3e63ea383a746855cfaf47b3034c621a23173fe87a8eaf7a65cd6ff9bf1137241c8ddb28e6e85bad7cd29945d90eaeda5d23da0057669986a44e5a#npm:5.20.0"],\
             ["@typescript-eslint/parser", "virtual:3f21ca9c8a3e63ea383a746855cfaf47b3034c621a23173fe87a8eaf7a65cd6ff9bf1137241c8ddb28e6e85bad7cd29945d90eaeda5d23da0057669986a44e5a#npm:5.20.0"],\
+            ["bcryptjs", "npm:2.4.3"],\
             ["dotenv", "npm:16.0.0"],\
             ["eslint", "npm:8.14.0"],\
             ["eslint-config-prettier", "virtual:3f21ca9c8a3e63ea383a746855cfaf47b3034c621a23173fe87a8eaf7a65cd6ff9bf1137241c8ddb28e6e85bad7cd29945d90eaeda5d23da0057669986a44e5a#npm:8.5.0"],\
             ["eslint-plugin-unused-imports", "virtual:3f21ca9c8a3e63ea383a746855cfaf47b3034c621a23173fe87a8eaf7a65cd6ff9bf1137241c8ddb28e6e85bad7cd29945d90eaeda5d23da0057669986a44e5a#npm:2.0.0"],\
+            ["joi", "npm:17.6.0"],\
             ["koa", "npm:2.13.4"],\
             ["koa-bodyparser", "npm:4.3.0"],\
             ["mongoose", "npm:6.3.1"],\
@@ -88,6 +91,25 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["js-yaml", "npm:4.1.0"],\
             ["minimatch", "npm:3.1.2"],\
             ["strip-json-comments", "npm:3.1.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@hapi/hoek", [\
+        ["npm:9.2.1", {\
+          "packageLocation": "./.yarn/cache/@hapi-hoek-npm-9.2.1-5e7f2fab98-6a439f672d.zip/node_modules/@hapi/hoek/",\
+          "packageDependencies": [\
+            ["@hapi/hoek", "npm:9.2.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@hapi/topo", [\
+        ["npm:5.1.0", {\
+          "packageLocation": "./.yarn/cache/@hapi-topo-npm-5.1.0-5e0b776809-604dfd5dde.zip/node_modules/@hapi/topo/",\
+          "packageDependencies": [\
+            ["@hapi/topo", "npm:5.1.0"],\
+            ["@hapi/hoek", "npm:9.2.1"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -158,6 +180,34 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["@sideway/address", [\
+        ["npm:4.1.4", {\
+          "packageLocation": "./.yarn/cache/@sideway-address-npm-4.1.4-32f94bc9f5-b9fca2a93a.zip/node_modules/@sideway/address/",\
+          "packageDependencies": [\
+            ["@sideway/address", "npm:4.1.4"],\
+            ["@hapi/hoek", "npm:9.2.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@sideway/formula", [\
+        ["npm:3.0.0", {\
+          "packageLocation": "./.yarn/cache/@sideway-formula-npm-3.0.0-8688cb96b6-8ae26a0ed6.zip/node_modules/@sideway/formula/",\
+          "packageDependencies": [\
+            ["@sideway/formula", "npm:3.0.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@sideway/pinpoint", [\
+        ["npm:2.0.0", {\
+          "packageLocation": "./.yarn/cache/@sideway-pinpoint-npm-2.0.0-66d94e687e-0f4491e589.zip/node_modules/@sideway/pinpoint/",\
+          "packageDependencies": [\
+            ["@sideway/pinpoint", "npm:2.0.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["@tsconfig/node10", [\
         ["npm:1.0.8", {\
           "packageLocation": "./.yarn/cache/@tsconfig-node10-npm-1.0.8-90a8cce25d-b8d5fffbc6.zip/node_modules/@tsconfig/node10/",\
@@ -200,6 +250,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [\
             ["@types/accepts", "npm:1.3.5"],\
             ["@types/node", "npm:17.0.25"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@types/bcryptjs", [\
+        ["npm:2.4.2", {\
+          "packageLocation": "./.yarn/cache/@types-bcryptjs-npm-2.4.2-3a0c115732-220dade7b0.zip/node_modules/@types/bcryptjs/",\
+          "packageDependencies": [\
+            ["@types/bcryptjs", "npm:2.4.2"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -752,6 +811,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/base64-js-npm-1.5.1-b2f7275641-669632eb37.zip/node_modules/base64-js/",\
           "packageDependencies": [\
             ["base64-js", "npm:1.5.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["bcryptjs", [\
+        ["npm:2.4.3", {\
+          "packageLocation": "./.yarn/cache/bcryptjs-npm-2.4.3-32de4957eb-0e80ed852a.zip/node_modules/bcryptjs/",\
+          "packageDependencies": [\
+            ["bcryptjs", "npm:2.4.3"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -1740,6 +1808,20 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["joi", [\
+        ["npm:17.6.0", {\
+          "packageLocation": "./.yarn/cache/joi-npm-17.6.0-987ef6515f-eaf62f6c02.zip/node_modules/joi/",\
+          "packageDependencies": [\
+            ["joi", "npm:17.6.0"],\
+            ["@hapi/hoek", "npm:9.2.1"],\
+            ["@hapi/topo", "npm:5.1.0"],\
+            ["@sideway/address", "npm:4.1.4"],\
+            ["@sideway/formula", "npm:3.0.0"],\
+            ["@sideway/pinpoint", "npm:2.0.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["js-yaml", [\
         ["npm:4.1.0", {\
           "packageLocation": "./.yarn/cache/js-yaml-npm-4.1.0-3606f32312-c7830dfd45.zip/node_modules/js-yaml/",\
@@ -2228,16 +2310,19 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [\
             ["quicksend-server", "workspace:."],\
             ["@koa/router", "npm:10.1.1"],\
+            ["@types/bcryptjs", "npm:2.4.2"],\
             ["@types/koa", "npm:2.13.4"],\
             ["@types/koa-bodyparser", "npm:4.3.7"],\
             ["@types/koa__router", "npm:8.0.11"],\
             ["@types/node", "npm:17.0.25"],\
             ["@typescript-eslint/eslint-plugin", "virtual:3f21ca9c8a3e63ea383a746855cfaf47b3034c621a23173fe87a8eaf7a65cd6ff9bf1137241c8ddb28e6e85bad7cd29945d90eaeda5d23da0057669986a44e5a#npm:5.20.0"],\
             ["@typescript-eslint/parser", "virtual:3f21ca9c8a3e63ea383a746855cfaf47b3034c621a23173fe87a8eaf7a65cd6ff9bf1137241c8ddb28e6e85bad7cd29945d90eaeda5d23da0057669986a44e5a#npm:5.20.0"],\
+            ["bcryptjs", "npm:2.4.3"],\
             ["dotenv", "npm:16.0.0"],\
             ["eslint", "npm:8.14.0"],\
             ["eslint-config-prettier", "virtual:3f21ca9c8a3e63ea383a746855cfaf47b3034c621a23173fe87a8eaf7a65cd6ff9bf1137241c8ddb28e6e85bad7cd29945d90eaeda5d23da0057669986a44e5a#npm:8.5.0"],\
             ["eslint-plugin-unused-imports", "virtual:3f21ca9c8a3e63ea383a746855cfaf47b3034c621a23173fe87a8eaf7a65cd6ff9bf1137241c8ddb28e6e85bad7cd29945d90eaeda5d23da0057669986a44e5a#npm:2.0.0"],\
+            ["joi", "npm:17.6.0"],\
             ["koa", "npm:2.13.4"],\
             ["koa-bodyparser", "npm:4.3.0"],\
             ["mongoose", "npm:6.3.1"],\

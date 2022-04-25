@@ -3,6 +3,7 @@ import Koa from "koa";
 import errorHandler from "./errors";
 import router from "./router";
 import responseHandler from "./response";
+import db from "./db/database";
 
 const app = new Koa();
 
@@ -19,4 +20,6 @@ app.use(router.routes());
 app.use(router.allowedMethods());
 
 app.listen(process.env.PORT);
-console.log(`Listening on port ${process.env.PORT}...`);
+console.log(`Listening on port ${process.env.PORT}`);
+
+db.connect().then(() => console.log("Database connected"));
