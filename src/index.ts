@@ -6,8 +6,8 @@ import responseHandler from "./response";
 
 const app = new Koa();
 
-app.use(responseHandler);
-app.use(errorHandler);
+app.use(responseHandler());
+app.use(errorHandler());
 
 router.get("/", (ctx, next) => {
 	ctx.body = "Hi!";
