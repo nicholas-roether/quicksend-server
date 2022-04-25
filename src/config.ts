@@ -1,8 +1,10 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-const requiredEnvVars = ["PORT"];
+function requireEnvVar(name: string): string {
+	const value = process.env[name];
+	if (!value) throw new Error(`Missing environment variable '${name}'!`);
+	return value;
+}
 
-for (const envVar of requiredEnvVars)
-	if (!process.env[envVar])
-		throw new Error(`Missing environment variable '${envVar}'!`);
+export { requireEnvVar };
