@@ -1,10 +1,16 @@
 import "./config";
-import express from "express";
+import Koa from "koa";
+import errorMiddleware from "./errors";
+import { dataResponse } from "./response";
 
-const app = express();
+const app = new Koa();
 
-app.get("/", (req, res) => {
-	res.send("Hello World!");
+app.use(errorMiddleware);
+
+app.use((ctx, next) => {
+	dataResponse(ctx, "Hello World!");
+	// ctx.throw("test2", 200);
+	next();
 });
 
 app.listen(process.env.PORT);
