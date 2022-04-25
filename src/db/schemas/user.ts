@@ -3,7 +3,7 @@ import { DeviceModel } from "../models";
 
 interface User {
 	username: string;
-	display: string;
+	display?: string;
 	passwordHash: string;
 	devices: mongoose.Types.ObjectId[];
 }
