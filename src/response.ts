@@ -6,12 +6,8 @@ function rawResponse(ctx: Koa.Context, body: unknown, status = 200) {
 }
 
 function jsonResponse(ctx: Koa.Context, json: unknown, status?: number) {
-	if (!ctx.accepts("json") && status != 406) {
-		errorResponse(ctx, `Unsupported content type '${ctx.type}'.`, 406);
-	} else {
-		ctx.type = "json";
-		rawResponse(ctx, JSON.stringify(json), status);
-	}
+	ctx.type = "json";
+	rawResponse(ctx, JSON.stringify(json), status);
 }
 
 function errorResponse(ctx: Koa.Context, message: string, status = 500): void {
