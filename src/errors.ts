@@ -1,8 +1,7 @@
 import assert from "assert";
 import Koa from "koa";
-import { errorResponse } from "./response";
 
-const errorMiddleware: Koa.Middleware = async (ctx, next) => {
+const errorHandler: Koa.Middleware = async (ctx, next) => {
 	try {
 		await next();
 	} catch (err) {
@@ -10,13 +9,11 @@ const errorMiddleware: Koa.Middleware = async (ctx, next) => {
 			err instanceof Error,
 			`Unexpected thrown object of type ${typeof err}`
 		);
-		errorResponse(
-			ctx,
-			err.message,
-			err instanceof Koa.HttpError ? err.status : 500
-		);
+		ctx.state.error = true;
+		ctx.status = err instanceof Koa.HttpError ? err.status : 500;
+		ctx.body = err.message;
 		if (ctx.status == 500) ctx.app.emit("error", err);
 	}
 };
 
-export default errorMiddleware;
+export default errorHandler;

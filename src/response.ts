@@ -1,21 +1,24 @@
 import Koa from "koa";
+type ResponseObject = { data: unknown } | { error: string };
 
-function rawResponse(ctx: Koa.Context, body: unknown, status = 200) {
-	ctx.status = status;
-	ctx.body = body;
-}
+const serializers: Record<string, (obj: unknown) => string> = {
+	json: (obj) => JSON.stringify(obj)
+};
 
-function jsonResponse(ctx: Koa.Context, json: unknown, status?: number) {
-	ctx.type = "json";
-	rawResponse(ctx, JSON.stringify(json), status);
-}
+const responseHandler: Koa.Middleware = async (ctx, next) => {
+	await next();
+	let resObj: ResponseObject | null = null;
+	if (ctx.state.error) resObj = { error: ctx.body };
+	else resObj = { data: ctx.body };
+	const format = ctx.accepts(...Object.keys(serializers));
+	if (!format) {
+		ctx.status = 406;
+		ctx.type = "text/plain";
+		ctx.body = "No supported content type found";
+		return;
+	}
+	ctx.type = format;
+	ctx.body = serializers[format](resObj);
+};
 
-function errorResponse(ctx: Koa.Context, message: string, status = 500): void {
-	jsonResponse(ctx, { error: message }, status);
-}
-
-function dataResponse(ctx: Koa.Context, data: unknown, status?: number): void {
-	jsonResponse(ctx, { data }, status);
-}
-
-export { rawResponse, jsonResponse, errorResponse, dataResponse };
+export default responseHandler;
