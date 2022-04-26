@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import DeviceModel from "../models/device";
+import DeviceModel from "db/models/device";
 
 interface Message {
 	_id: mongoose.Types.ObjectId;

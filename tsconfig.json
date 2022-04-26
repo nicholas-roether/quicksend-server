@@ -5,6 +5,7 @@
       "types": ["node", "jest"],
 		"module": "commonjs",
 		"rootDir": "./src",
+		"baseUrl": "./src",
 		"moduleResolution": "node",
 		"resolveJsonModule": true,
       "noEmit": true,

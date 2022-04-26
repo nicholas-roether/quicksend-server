@@ -1,9 +1,9 @@
 import Router from "@koa/router";
 import Joi from "joi";
-import authHandler, { UserData } from "../auth";
-import bodyValidator from "../body_validator";
-import DeviceModel from "../db/models/device";
-import { Device } from "../db/schemas/device";
+import authHandler, { UserData } from "auth";
+import bodyValidator from "body_validator";
+import DeviceModel from "db/models/device";
+import { Device } from "db/schemas/device";
 
 const device = new Router({ prefix: "/device" });
 

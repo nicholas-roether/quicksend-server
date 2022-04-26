@@ -1,5 +1,5 @@
 import Koa from "koa";
-import response from "../../response";
+import response from "response";
 import createContext from "koa-create-context";
 
 describe("the response() middleware", () => {

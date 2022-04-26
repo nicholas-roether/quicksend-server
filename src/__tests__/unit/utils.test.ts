@@ -3,7 +3,7 @@ import {
 	decodeBase64,
 	encodeBase64,
 	splitAtIndex
-} from "../../utils";
+} from "utils";
 
 describe("collapseWhitespace()", () => {
 	test("makes no changes to a string containing no whitespace", () => {
