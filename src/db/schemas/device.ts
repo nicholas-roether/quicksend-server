@@ -10,7 +10,8 @@ interface Device {
 	 * |--------|-------------------------|
 	 * |      0 | Unknown device type     |
 	 * |      1 | Mobile device           |
-	 * |     2+ | Reserved for future use |
+	 * |      2 | Desktop device          |
+	 * |     3+ | Unused                  |
 	 */
 	type: number;
 	user: mongoose.Types.ObjectId;
