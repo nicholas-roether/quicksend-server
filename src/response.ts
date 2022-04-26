@@ -8,6 +8,7 @@ const serializers: Record<string, (obj: unknown) => string> = {
 function responseHandler(): Koa.Middleware {
 	return async (ctx, next) => {
 		await next();
+		if (!ctx.body) return ctx.res.end();
 		let resObj: ResponseObject | null = null;
 		if (ctx.state.error) resObj = { error: ctx.body };
 		else resObj = { data: ctx.body };
