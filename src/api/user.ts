@@ -2,7 +2,6 @@ import Router from "@koa/router";
 import Joi from "joi";
 import bcrypt from "bcryptjs";
 import UserModel from "db/models/user";
-import authHandler from "auth";
 import bodyValidator from "body_validator";
 
 const user = new Router({ prefix: "/user" });

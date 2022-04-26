@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import DeviceModel from "db/models/device";
 
 interface User {
 	_id: mongoose.Types.ObjectId;
