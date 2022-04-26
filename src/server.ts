@@ -3,7 +3,8 @@ import Koa from "koa";
 import errorHandler from "./errors";
 import router from "./router";
 import responseHandler from "./response";
-import db from "./db/database";
+import mongoose from "mongoose";
+import { requireEnvVar } from "./config";
 
 const app = new Koa();
 
@@ -22,4 +23,6 @@ app.use(router.allowedMethods());
 app.listen(process.env.PORT);
 console.log(`Listening on port ${process.env.PORT}`);
 
-db.connect().then(() => console.log("Database connected"));
+mongoose
+	.connect(requireEnvVar("DB_URI"))
+	.then(() => console.log("Database connected"));

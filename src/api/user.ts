@@ -1,8 +1,11 @@
 import Router from "@koa/router";
 import Joi from "joi";
-import db from "../db/database";
+import bcrypt from "bcryptjs";
+import UserModel from "../db/models/user";
 
 const user = new Router({ prefix: "/user" });
+
+const PASSWORD_SALT_LENGTH = 10;
 
 interface CreateUserRequest {
 	username: string;
@@ -25,11 +28,16 @@ user.post("/create", async (ctx, next) => {
 	if (error) return ctx.throw(error.message, 400);
 	if (!body) return ctx.throw("Unexpected error", 500);
 
-	if (await db.userExists(body.username))
+	if (await UserModel.exists({ username: body.username }).exec())
 		return ctx.throw("User already exists", 400);
-	await db.createUser(body.username, body.password);
-	if (body.display) await db.setDisplayName(body.username, body.display);
+	const user = new UserModel({
+		username: body.username,
+		display: body.display,
+		passwordHash: bcrypt.hashSync(body.password, PASSWORD_SALT_LENGTH)
+	});
+	await user.save();
 	ctx.status = 201;
+	ctx.body = { id: user._id.toHexString() };
 	next();
 });
 
