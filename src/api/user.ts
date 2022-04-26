@@ -2,6 +2,8 @@ import Router from "@koa/router";
 import Joi from "joi";
 import bcrypt from "bcryptjs";
 import UserModel from "../db/models/user";
+import authHandler from "../auth";
+import bodyValidator from "../body_validator";
 
 const user = new Router({ prefix: "/user" });
 
@@ -23,10 +25,8 @@ const createUserSchema = Joi.object<CreateUserRequest>({
 	password: Joi.string().min(5).max(50)
 });
 
-user.post("/create", async (ctx, next) => {
-	const { error, value: body } = createUserSchema.validate(ctx.request.body);
-	if (error) return ctx.throw(error.message, 400);
-	if (!body) return ctx.throw(500, "Unexpected error");
+user.post("/create", bodyValidator(createUserSchema), async (ctx, next) => {
+	const body = ctx.request.body as CreateUserRequest;
 
 	if (await UserModel.exists({ username: body.username }).exec())
 		return ctx.throw(400, "User already exists");
