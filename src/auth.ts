@@ -109,10 +109,7 @@ async function authenticateSignature(ctx: Koa.Context) {
 	const params = parseSignatureAuthScheme(ctx);
 	const device = await DeviceModel.findById(params.keyId)
 		.select("signaturePublicKey user")
-		.populate<{ user: User & { _id: mongoose.Types.ObjectId } }>(
-			"user",
-			"username display"
-		)
+		.populate<{ user: User }>("user", "username display")
 		.exec();
 	if (!device) return ctx.throw(400, "Unknown device id");
 	if (
