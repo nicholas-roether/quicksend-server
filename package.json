@@ -9,7 +9,7 @@
 	"private": true,
 	"scripts": {
 		"start": "ts-node . --transpileOnly",
-      "dev": "ts-node-dev . --inspect=4321 --respawn --transpile-only",
+		"dev": "ts-node-dev . --inspect=4321 --respawn --transpile-only",
 		"lint": "eslint '.'",
 		"prepublishOnly": "tsc"
 	},
@@ -33,7 +33,6 @@
 		"@koa/router": "^10.1.1",
 		"bcryptjs": "^2.4.3",
 		"dotenv": "^16.0.0",
-		"eslint-plugin-unused-imports": "^2.0.0",
 		"joi": "^17.6.0",
 		"koa": "^2.13.4",
 		"koa-bodyparser": "^4.3.0",
