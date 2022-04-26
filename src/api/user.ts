@@ -13,7 +13,7 @@ interface CreateUserRequest {
 	password: string;
 }
 
-const schema = Joi.object<CreateUserRequest>({
+const createUserSchema = Joi.object<CreateUserRequest>({
 	username: Joi.string()
 		.pattern(/^[a-z0-9_-]+$/i)
 		.min(3)
@@ -24,12 +24,12 @@ const schema = Joi.object<CreateUserRequest>({
 });
 
 user.post("/create", async (ctx, next) => {
-	const { error, value: body } = schema.validate(ctx.request.body);
+	const { error, value: body } = createUserSchema.validate(ctx.request.body);
 	if (error) return ctx.throw(error.message, 400);
-	if (!body) return ctx.throw("Unexpected error", 500);
+	if (!body) return ctx.throw(500, "Unexpected error");
 
 	if (await UserModel.exists({ username: body.username }).exec())
-		return ctx.throw("User already exists", 400);
+		return ctx.throw(400, "User already exists");
 	const user = new UserModel({
 		username: body.username,
 		display: body.display,
@@ -38,7 +38,7 @@ user.post("/create", async (ctx, next) => {
 	await user.save();
 	ctx.status = 201;
 	ctx.body = { id: user._id.toHexString() };
-	next();
+	return next();
 });
 
 export default user;
