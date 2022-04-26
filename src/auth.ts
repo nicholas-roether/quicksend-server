@@ -114,7 +114,7 @@ async function authenticateSignature(ctx: Koa.Context) {
 			"username display"
 		)
 		.exec();
-	if (!device) return ctx.throw(400, "Device does not exist");
+	if (!device) return ctx.throw(400, "Unknown device id");
 	if (
 		!crypto.verify(
 			params.algorithm,
