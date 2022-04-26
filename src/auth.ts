@@ -135,9 +135,8 @@ interface AuthHandlerOptions {
 	authType?: "Basic" | "Signature";
 }
 
-function authHandler({
-	authType = "Signature"
-}: AuthHandlerOptions): Koa.Middleware {
+function authHandler(options?: AuthHandlerOptions): Koa.Middleware {
+	const authType = options?.authType ?? "Signature";
 	return async (ctx, next) => {
 		if (!ctx.get("Authorization")) {
 			ctx.set("WWW-Authenticate", `${authType}, charset="utf-8"`);
