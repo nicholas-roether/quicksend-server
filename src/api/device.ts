@@ -8,11 +8,13 @@ const device = new Router({ prefix: "/device" });
 interface AddDeviceRequest {
 	name: string;
 	signaturePublicKey: string;
+	encryptionPublicKey: string;
 }
 
 const addDeviceSchema = Joi.object<AddDeviceRequest>({
 	name: Joi.string().min(3).max(30).required(),
-	signaturePublicKey: Joi.string().required()
+	signaturePublicKey: Joi.string().required(),
+	encryptionPublicKey: Joi.string().required()
 });
 
 device.post("/add", authHandler({ authType: "Basic" }), async (ctx, next) => {
@@ -27,7 +29,8 @@ device.post("/add", authHandler({ authType: "Basic" }), async (ctx, next) => {
 	const device = new DeviceModel({
 		name: body.name,
 		user: userData.id,
-		signaturePublicKey: body.signaturePublicKey
+		signaturePublicKey: body.signaturePublicKey,
+		encryptionPublicKey: body.encryptionPublicKey
 	});
 	await device.save();
 	ctx.status = 201;

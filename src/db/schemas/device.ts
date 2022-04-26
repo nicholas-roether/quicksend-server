@@ -5,12 +5,14 @@ interface Device {
 	name: string;
 	user: mongoose.Types.ObjectId;
 	signaturePublicKey: string;
+	encryptionPublicKey: string;
 }
 
 const DeviceSchema = new mongoose.Schema<Device>({
 	name: { type: String, required: true },
 	user: { type: mongoose.SchemaTypes.ObjectId, required: true, ref: UserModel },
-	signaturePublicKey: { type: String, required: true }
+	signaturePublicKey: { type: String, required: true },
+	encryptionPublicKey: { type: String, required: true }
 });
 
 export default DeviceSchema;
