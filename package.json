@@ -2,13 +2,14 @@
 	"name": "quicksend-server",
 	"version": "1.0.0",
 	"description": "The server for the mobile messaging app quicksend",
-	"main": "dist/index.js",
+	"main": "src/server.ts",
 	"repository": "https://github.com/nicholas-roether/quicksend-server.git",
 	"author": "nicholas-roether <nicholas.roether@t-online.de>",
 	"license": "GNU General Public License",
 	"private": true,
 	"scripts": {
-		"start": "ts-node src/index.ts",
+		"start": "ts-node . --transpileOnly",
+      "dev": "ts-node-dev . --inspect=4321 --respawn --transpile-only",
 		"lint": "eslint '.'",
 		"prepublishOnly": "tsc"
 	},
@@ -24,6 +25,7 @@
 		"eslint-config-prettier": "^8.5.0",
 		"prettier": "^2.6.2",
 		"ts-node": "^10.7.0",
+		"ts-node-dev": "^1.1.8",
 		"typescript": "^4.6.3"
 	},
 	"packageManager": "yarn@3.2.0",
