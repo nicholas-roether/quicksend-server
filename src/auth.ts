@@ -126,6 +126,8 @@ async function authenticateSignature(ctx: Koa.Context) {
 		username: device.user.username,
 		display: device.user.display
 	} as UserData;
+	device.lastActivity = new Date();
+	await device.save();
 }
 
 interface AuthHandlerOptions {
