@@ -7,7 +7,7 @@
 		"rootDir": "./src",
 		"moduleResolution": "node",
 		"resolveJsonModule": true,
-      "sourceMap": true,
+      "noEmit": true,
 		"importHelpers": true,
 		"downlevelIteration": true,
 		"newLine": "lf",
