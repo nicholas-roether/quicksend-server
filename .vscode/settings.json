@@ -1,14 +1,15 @@
 {
-  "search.exclude": {
-    "**/.yarn": true,
-    "**/.pnp.*": true
-  },
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "[typescript]": {
-    "editor.formatOnSave": true
-  },
-  "eslint.nodePath": ".yarn/sdks",
-  "prettier.prettierPath": ".yarn/sdks/prettier/index.js",
-  "typescript.tsdk": ".yarn/sdks/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true
+	"search.exclude": {
+		 "**/.yarn": true,
+		 "**/.pnp.*": true
+	},
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"[typescript]": {
+ 		"editor.formatOnSave": true
+	},
+	"eslint.nodePath": ".yarn/sdks",
+	"prettier.prettierPath": ".yarn/sdks/prettier/index.js",
+	"typescript.tsdk": ".yarn/sdks/typescript/lib",
+	"typescript.enablePromptUseWorkspaceTsdk": true,
+	"jest.jestCommandLine": "yarn jest",
 }

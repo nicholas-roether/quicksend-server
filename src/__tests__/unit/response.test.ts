@@ -1,13 +1,13 @@
 import Koa from "koa";
 import response from "response";
-import createContext from "koa-create-context";
+import { mockContext } from "../__utils__/koa_mock";
 
 describe("the response() middleware", () => {
-	let ctx: Koa.Context = createContext();
-	let next: Koa.Next = jest.fn();
+	let ctx: Koa.Context;
+	let next: Koa.Next;
 
 	beforeEach(() => {
-		ctx = createContext({ status: 200 });
+		ctx = mockContext();
 		next = jest.fn();
 	});
 
@@ -15,7 +15,7 @@ describe("the response() middleware", () => {
 		expect(next).toHaveBeenCalled();
 	});
 
-	test("Habdkes empty response bodies", async () => {
+	test("Handles empty response bodies", async () => {
 		await response()(ctx, next);
 		expect(ctx.body).toEqual("{}");
 		expect(ctx.status).toEqual(200);

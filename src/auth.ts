@@ -58,9 +58,10 @@ function parseAuthorization(ctx: Koa.Context, requiredScheme: string): string {
 
 function parseBasicAuthScheme(ctx: Koa.Context): BasicAuthParams {
 	const paramString = parseAuthorization(ctx, "Basic");
+	if (!paramString) return ctx.throw(400, "Malformed authorization header");
 	const decoded = decodeBase64(paramString);
 	const res = decoded.match(/^(.+):(.+)$/);
-	if (!res) ctx.throw(400, "Malformed login token");
+	if (!res) return ctx.throw(400, "Malformed login token");
 	return {
 		username: res[1],
 		password: res[2]

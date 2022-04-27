@@ -8,11 +8,13 @@ function splitAtIndex(str: string, index: number): [string, string] {
 }
 
 function encodeBase64(str: string): string {
+	if (!str) return str;
 	const buffer = Buffer.from(str, "utf-8");
 	return buffer.toString("base64");
 }
 
 function decodeBase64(str: string): string {
+	if (!str) return str;
 	const buffer = Buffer.from(str, "base64");
 	return buffer.toString("utf-8");
 }

@@ -13,7 +13,7 @@ function errorHandler(): Koa.Middleware {
 			ctx.state.error = true;
 			ctx.status = err instanceof Koa.HttpError ? err.status : 500;
 			ctx.body = err.message;
-			if (ctx.status == 500) ctx.app.emit("error", err);
+			if (ctx.status == 500) console.error("[ERROR] " + err.message);
 		}
 	};
 }

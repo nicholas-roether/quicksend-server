@@ -8,15 +8,27 @@
 			"type": "node-terminal",
 			"request": "launch",
 			"name": "Launch Program",
-         "command": "yarn dev",
-         "cwd": "${workspaceFolder}"
+			"command": "yarn dev",
+			"cwd": "${workspaceFolder}"
 		},
 		{
-			"type": "node-terminal",
+			"type": "node",
+			"name": "vscode-jest-tests.v2",
 			"request": "launch",
-			"name": "Run Tests",
-         "command": "yarn test",
-         "cwd": "${workspaceFolder}"
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen",
+			"disableOptimisticBPs": true,
+			"cwd": "${workspaceFolder}",
+			"runtimeExecutable": "yarn",
+			"args": [
+				"test",
+				"--runInBand",
+				"--watchAll=false",
+				"--testNamePattern",
+				"${jest.testNamePattern}",
+				"--runTestsByPath",
+				"${jest.testFile}"
+			]
 		}
 	]
 }
