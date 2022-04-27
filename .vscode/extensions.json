@@ -1,8 +1,8 @@
 {
-  "recommendations": [
-    "arcanis.vscode-zipfs",
-    "esbenp.prettier-vscode",
-    "dbaeumer.vscode-eslint",
-	 "orta.vscode-jest"
-  ]
+	"recommendations": [
+		"arcanis.vscode-zipfs",
+		"esbenp.prettier-vscode",
+		"dbaeumer.vscode-eslint",
+		"orta.vscode-jest"
+	]
 }
