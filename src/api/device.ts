@@ -1,6 +1,6 @@
 import Router from "@koa/router";
 import Joi from "joi";
-import authHandler, { UserData } from "auth";
+import authHandler, { UserData } from "authorization/handler";
 import bodyValidator from "body_validator";
 import DeviceModel from "db/models/device";
 
@@ -25,7 +25,7 @@ const addDeviceSchema = Joi.object<AddDeviceRequest>({
 
 device.post(
 	"/add",
-	authHandler({ authType: "Basic" }),
+	authHandler("Basic"),
 	bodyValidator(addDeviceSchema),
 	async (ctx, next) => {
 		const body = ctx.request.body as AddDeviceRequest;

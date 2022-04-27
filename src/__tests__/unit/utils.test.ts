@@ -2,6 +2,7 @@ import {
 	collapseWhitespace,
 	decodeBase64,
 	encodeBase64,
+	includesAll,
 	splitAtIndex
 } from "utils";
 
@@ -18,6 +19,16 @@ describe("collapseWhitespace()", () => {
 		expect(collapseWhitespace("sdfg   fgdh  asds weerw   a")).toEqual(
 			"sdfg fgdh asds weerw a"
 		);
+	});
+
+	test("removes leading whitespace", () => {
+		expect(collapseWhitespace(" abc")).toEqual("abc");
+		expect(collapseWhitespace("   abc")).toEqual("abc");
+	});
+
+	test("removes trailing whitespace", () => {
+		expect(collapseWhitespace("abc ")).toEqual("abc");
+		expect(collapseWhitespace("abc   ")).toEqual("abc");
 	});
 });
 
@@ -44,5 +55,14 @@ describe("encodeBase64()", () => {
 describe("decodeBase64()", () => {
 	test("correctly decodes base64", () => {
 		expect(decodeBase64("dGVzdCB0ZXN0IHRlc3Q")).toEqual("test test test");
+	});
+});
+
+describe("includesAll()", () => {
+	test("correctly recognizes subsets", () => {
+		expect(includesAll([1, 2, 3, 4], 3, 1)).toBe(true);
+	});
+	test("correctly recognizes unincluded items", () => {
+		expect(includesAll([1, 2, 3, 4], 5, 1)).toBe(false);
 	});
 });
