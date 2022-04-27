@@ -1,7 +1,7 @@
 import Joi from "joi";
 import Koa from "koa";
 import bodyValidator from "body_validator";
-import { mockContext, catchMiddlewareErrors } from "../__utils__/koa_mock";
+import { mockContext, catchMiddlewareErrors } from "./__utils__/koa_mock";
 
 const testSchema = Joi.object({
 	val: Joi.number().required()

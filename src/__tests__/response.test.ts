@@ -1,6 +1,6 @@
 import Koa from "koa";
 import response from "response";
-import { mockContext } from "../__utils__/koa_mock";
+import { mockContext } from "./__utils__/koa_mock";
 
 describe("the response() middleware", () => {
 	let ctx: Koa.Context;
