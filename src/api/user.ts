@@ -1,8 +1,8 @@
 import Router from "@koa/router";
 import Joi from "joi";
 import bcrypt from "bcryptjs";
-import bodyValidator from "quicksend-server/body_validator";
-import UserModel from "quicksend-server/db/models/user";
+import bodyValidator from "src/body_validator";
+import UserModel from "src/db/models/user";
 
 const user = new Router({ prefix: "/user" });
 

@@ -5014,6 +5014,7 @@ __metadata:
     koa-create-context: ^1.0.2
     mongoose: ^6.3.1
     prettier: ^2.6.2
+    src: "link:./src"
     supertest: ^6.2.2
     ts-jest: ^27.1.4
     ts-node: ^10.7.0
@@ -5379,6 +5380,12 @@ __metadata:
   checksum: 19d79aec211f09b99ec3099b5b2ae2f6e9cdefe50bc91ac4c69144b6d3928a640bb6ae5b3def70c2e85a2c3d9f5ec2719921e3a59d3ca3ef4b2fd1a4656a0df3
   languageName: node
   linkType: hard
+
+"src@link:./src::locator=quicksend-server%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "src@link:./src::locator=quicksend-server%40workspace%3A."
+  languageName: node
+  linkType: soft
 
 "sshpk@npm:^1.14.1":
   version: 1.17.0

@@ -1,6 +1,6 @@
 import assert from "assert";
-import parseAuthorization from "quicksend-server/authorization/parse";
-import { encodeBase64 } from "quicksend-server/utils";
+import parseAuthorization from "src/authorization/parse";
+import { encodeBase64 } from "src/utils";
 
 describe("parseAuthorization()", () => {
 	test("correctly handles unknown auth schemes", () => {

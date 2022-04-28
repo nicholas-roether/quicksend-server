@@ -1,6 +1,6 @@
 import Joi from "joi";
 import Koa from "koa";
-import bodyValidator from "quicksend-server/body_validator";
+import bodyValidator from "src/body_validator";
 import { mockContext, catchMiddlewareErrors } from "./__utils__/koa_mock";
 
 const testSchema = Joi.object({

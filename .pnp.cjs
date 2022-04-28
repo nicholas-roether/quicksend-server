@@ -55,6 +55,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["koa-create-context", "virtual:3f21ca9c8a3e63ea383a746855cfaf47b3034c621a23173fe87a8eaf7a65cd6ff9bf1137241c8ddb28e6e85bad7cd29945d90eaeda5d23da0057669986a44e5a#npm:1.0.2"],\
             ["mongoose", "npm:6.3.1"],\
             ["prettier", "npm:2.6.2"],\
+            ["src", "link:./src::locator=quicksend-server%40workspace%3A."],\
             ["supertest", "npm:6.2.2"],\
             ["ts-jest", "virtual:3f21ca9c8a3e63ea383a746855cfaf47b3034c621a23173fe87a8eaf7a65cd6ff9bf1137241c8ddb28e6e85bad7cd29945d90eaeda5d23da0057669986a44e5a#npm:27.1.4"],\
             ["ts-node", "virtual:3f21ca9c8a3e63ea383a746855cfaf47b3034c621a23173fe87a8eaf7a65cd6ff9bf1137241c8ddb28e6e85bad7cd29945d90eaeda5d23da0057669986a44e5a#npm:10.7.0"],\
@@ -6247,6 +6248,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["koa-create-context", "virtual:3f21ca9c8a3e63ea383a746855cfaf47b3034c621a23173fe87a8eaf7a65cd6ff9bf1137241c8ddb28e6e85bad7cd29945d90eaeda5d23da0057669986a44e5a#npm:1.0.2"],\
             ["mongoose", "npm:6.3.1"],\
             ["prettier", "npm:2.6.2"],\
+            ["src", "link:./src::locator=quicksend-server%40workspace%3A."],\
             ["supertest", "npm:6.2.2"],\
             ["ts-jest", "virtual:3f21ca9c8a3e63ea383a746855cfaf47b3034c621a23173fe87a8eaf7a65cd6ff9bf1137241c8ddb28e6e85bad7cd29945d90eaeda5d23da0057669986a44e5a#npm:27.1.4"],\
             ["ts-node", "virtual:3f21ca9c8a3e63ea383a746855cfaf47b3034c621a23173fe87a8eaf7a65cd6ff9bf1137241c8ddb28e6e85bad7cd29945d90eaeda5d23da0057669986a44e5a#npm:10.7.0"],\
@@ -6642,6 +6644,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["sprintf-js", "npm:1.0.3"]\
           ],\
           "linkType": "HARD"\
+        }]\
+      ]],\
+      ["src", [\
+        ["link:./src::locator=quicksend-server%40workspace%3A.", {\
+          "packageLocation": "./src/",\
+          "packageDependencies": [\
+            ["src", "link:./src::locator=quicksend-server%40workspace%3A."]\
+          ],\
+          "linkType": "SOFT",\
+          "discardFromLookup": true\
         }]\
       ]],\
       ["sshpk", [\

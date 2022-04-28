@@ -6,7 +6,7 @@
 		"module": "commonjs",
 		"rootDir": "./src",
 		"paths": {
-			"quicksend-server/*": ["./src/*"]
+			"src/*": ["./src/*"]
 		},
 		"moduleResolution": "node",
 		"resolveJsonModule": true,

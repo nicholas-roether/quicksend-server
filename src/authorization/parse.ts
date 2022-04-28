@@ -1,4 +1,4 @@
-import { collapseWhitespace, decodeBase64 } from "quicksend-server/utils";
+import { collapseWhitespace, decodeBase64 } from "src/utils";
 import {
 	AuthorizationRequest,
 	BasicAuthorizationRequest,

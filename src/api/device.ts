@@ -1,8 +1,8 @@
 import Router from "@koa/router";
 import Joi from "joi";
-import authHandler, { UserData } from "quicksend-server/authorization/handler";
-import bodyValidator from "quicksend-server/body_validator";
-import DeviceModel from "quicksend-server/db/models/device";
+import authHandler, { UserData } from "src/authorization/handler";
+import bodyValidator from "src/body_validator";
+import DeviceModel from "src/db/models/device";
 
 const device = new Router({ prefix: "/device" });
 

@@ -1,8 +1,8 @@
-import { requireEnvVar } from "quicksend-server/config";
-import UserModel from "quicksend-server/db/models/user";
+import { requireEnvVar } from "src/config";
+import UserModel from "src/db/models/user";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-import app from "quicksend-server/server";
+import app from "src/server";
 import request from "supertest";
 
 describe("POST /user/create ", () => {

@@ -4,7 +4,7 @@ import {
 	encodeBase64,
 	includesAll,
 	splitAtIndex
-} from "quicksend-server/utils";
+} from "src/utils";
 
 describe("collapseWhitespace()", () => {
 	test("makes no changes to a string containing no whitespace", () => {

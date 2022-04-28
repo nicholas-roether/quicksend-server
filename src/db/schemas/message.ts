@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import DeviceModel from "quicksend-server/db/models/device";
+import DeviceModel from "src/db/models/device";
 
 interface Message {
 	_id: mongoose.Types.ObjectId;

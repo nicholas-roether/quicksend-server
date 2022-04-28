@@ -7,10 +7,10 @@ import {
 	BasicAuthorizationRequest,
 	SignatureAuthorizationRequest
 } from "./schemes";
-import UserModel from "quicksend-server/db/models/user";
-import { includesAll } from "quicksend-server/utils";
-import DeviceModel from "quicksend-server/db/models/device";
-import { User } from "quicksend-server/db/schemas/user";
+import UserModel from "src/db/models/user";
+import { includesAll } from "src/utils";
+import DeviceModel from "src/db/models/device";
+import { User } from "src/db/schemas/user";
 
 interface UserData {
 	id: mongoose.Types.ObjectId;
