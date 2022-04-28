@@ -21,7 +21,7 @@ const createUserSchema = Joi.object<CreateUserRequest>({
 		.max(30)
 		.required(),
 	display: Joi.string().min(3).max(30),
-	password: Joi.string().min(5).max(50)
+	password: Joi.string().min(5).max(50).required()
 });
 
 user.post("/create", bodyValidator(createUserSchema), async (ctx, next) => {

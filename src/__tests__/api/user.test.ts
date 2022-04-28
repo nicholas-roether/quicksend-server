@@ -59,4 +59,15 @@ describe("POST /user/create ", () => {
 		const users = await UserModel.find().exec();
 		expect(users.length).toBe(1);
 	});
+
+	test("Handles incomplete requests", async () => {
+		await request(app)
+			.post("/user/create")
+			.send({ username: "tresfdhg" })
+			.expect(400);
+		await request(app)
+			.post("/user/create")
+			.send({ password: "tresfdhg" })
+			.expect(400);
+	});
 });
