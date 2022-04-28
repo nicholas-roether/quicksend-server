@@ -7,6 +7,7 @@ const serializers: Record<string, (obj: unknown) => string> = {
 
 function responseHandler(): Koa.Middleware {
 	return async (ctx, next) => {
+		ctx.request.header.accept = ctx.get("Accept").split(";")[0];
 		const format = ctx.accepts(...Object.keys(serializers));
 		if (!format) {
 			ctx.status = 406;
