@@ -18,7 +18,7 @@ describe("POST /user/create ", () => {
 		await mongoose.disconnect();
 	});
 
-	beforeEach(async () => {
+	afterEach(async () => {
 		await mongoose.connection.db.dropDatabase();
 	});
 
@@ -37,6 +37,7 @@ describe("POST /user/create ", () => {
 		);
 
 		const users = await UserModel.find().exec();
+		console.log(users);
 		expect(users.length).toBe(1);
 		const user = users[0];
 		expect(user.username).toBe("test-user");
