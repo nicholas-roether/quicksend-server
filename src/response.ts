@@ -5,21 +5,51 @@ const serializers: Record<string, (obj: unknown) => string> = {
 	json: (obj) => JSON.stringify(obj)
 };
 
+function handleCharset(ctx: Koa.Context): boolean {
+	const acceptHeader = ctx.get("Accept");
+	if (!acceptHeader) return true;
+	const [accept, param] = acceptHeader.split(";");
+	ctx.request.header.accept = accept;
+	if (!param) return true;
+	const match = param.match(/charset=([a-z0-9_-]+)/i);
+	if (match) {
+		const charset = match[1];
+		if (!/^utf-?8$/i.test(charset)) {
+			ctx.status = 406;
+			ctx.body = "Encoding not supported";
+			return false;
+		}
+	}
+	return true;
+}
+
+function getFormat(ctx: Koa.Context): string | null {
+	const format = ctx.accepts(...Object.keys(serializers));
+	if (!format) {
+		ctx.status = 406;
+		ctx.body = "No supported content type found";
+		return null;
+	}
+	return format;
+}
+
+function serializeResponse(ctx: Koa.Context, format: string) {
+	let resObj: ResponseObject | null = null;
+	if (ctx.state.error) resObj = { error: String(ctx.body) };
+	else resObj = { data: ctx.body };
+	ctx.type = format;
+	ctx.body = serializers[format](resObj);
+}
+
 function responseHandler(): Koa.Middleware {
 	return async (ctx, next) => {
-		ctx.request.header.accept = ctx.get("Accept").split(";")[0];
-		const format = ctx.accepts(...Object.keys(serializers));
-		if (!format) {
-			ctx.status = 406;
-			ctx.body = "No supported content type found";
-			return;
-		}
+		if (!handleCharset(ctx)) return;
+		const format = getFormat(ctx);
+		if (!format) return;
+
 		await next();
-		let resObj: ResponseObject | null = null;
-		if (ctx.state.error) resObj = { error: ctx.body };
-		else resObj = { data: ctx.body };
-		ctx.type = format;
-		ctx.body = serializers[format](resObj);
+
+		serializeResponse(ctx, format);
 	};
 }
 
