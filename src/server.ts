@@ -4,7 +4,7 @@ import errorHandler from "./errors";
 import router from "./router";
 import responseHandler from "./response";
 import mongoose from "mongoose";
-import { requireEnvVar } from "./config";
+import { requireEnvVar } from "./utils";
 
 const app = new Koa();
 

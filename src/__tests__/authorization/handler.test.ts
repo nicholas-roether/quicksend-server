@@ -2,8 +2,7 @@ import authHandler from "src/authorization/handler";
 import Koa from "koa";
 import mongoose from "mongoose";
 import crypto from "crypto";
-import { requireEnvVar } from "src/config";
-import { encodeBase64 } from "src/utils";
+import { encodeBase64, requireEnvVar } from "src/utils";
 import UserModel from "src/db/models/user";
 import bcrypt from "bcryptjs";
 import {

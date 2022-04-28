@@ -26,10 +26,17 @@ function includesAll<T>(arr: T[], ...values: T[]): boolean {
 	return notIncluded.size == 0;
 }
 
+function requireEnvVar(name: string): string {
+	const value = process.env[name];
+	if (!value) throw new Error(`Missing environment variable '${name}'!`);
+	return value;
+}
+
 export {
 	collapseWhitespace,
 	splitAtIndex,
 	encodeBase64,
 	decodeBase64,
-	includesAll
+	includesAll,
+	requireEnvVar
 };

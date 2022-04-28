@@ -1,9 +1,9 @@
-import { requireEnvVar } from "src/config";
 import UserModel from "src/db/models/user";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 import app from "src/server";
 import request from "supertest";
+import { requireEnvVar } from "src/utils";
 
 describe("POST /user/create ", () => {
 	beforeAll(async () => {
