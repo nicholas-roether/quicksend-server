@@ -27,9 +27,9 @@ describe("POST /user/create ", () => {
 				display: "Test User",
 				password: "password1234"
 			})
-			.set("Accept", 'application/json; charset="utf-8"')
+			.set("Accept", "application/json; charset=utf-8")
 			.expect(201)
-			.expect("Content-Type", 'application/json; charset="utf-8"');
+			.expect("Content-Type", expect.stringContaining("application/json"));
 
 		const users = await UserModel.find().exec();
 		expect(users.length).toBe(1);

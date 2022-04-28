@@ -1,3 +1,4 @@
+import "src/config";
 import authHandler from "src/authorization/handler";
 import Koa from "koa";
 import mongoose from "mongoose";
@@ -25,9 +26,12 @@ describe("the authHandler() middleware for Basic auth", () => {
 		await mongoose.disconnect();
 	});
 
-	beforeEach(async () => {
+	beforeEach(() => {
 		ctx = mockContext();
 		next = jest.fn();
+	});
+
+	afterEach(async () => {
 		await mongoose.connection.db.dropDatabase();
 	});
 
@@ -135,6 +139,9 @@ describe("the authHandler() middleware for Signature auth", () => {
 	beforeEach(async () => {
 		ctx = mockContext();
 		next = jest.fn();
+	});
+
+	afterEach(async () => {
 		await mongoose.connection.db.dropDatabase();
 	});
 

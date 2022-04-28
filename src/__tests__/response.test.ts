@@ -11,14 +11,11 @@ describe("the response() middleware", () => {
 		next = jest.fn();
 	});
 
-	afterEach(() => {
-		expect(next).toHaveBeenCalled();
-	});
-
 	test("Handles empty response bodies", async () => {
 		await response()(ctx, next);
 		expect(ctx.body).toEqual("{}");
 		expect(ctx.status).toEqual(200);
+		expect(next).toHaveBeenCalled();
 	});
 
 	test("Handles response body serialization", async () => {
@@ -27,6 +24,7 @@ describe("the response() middleware", () => {
 		await response()(ctx, next);
 		expect(ctx.body).toEqual('{"data":{"val":69}}');
 		expect(ctx.status).toEqual(201);
+		expect(next).toHaveBeenCalled();
 	});
 
 	test("Handles error responses", async () => {
@@ -36,6 +34,7 @@ describe("the response() middleware", () => {
 		await response()(ctx, next);
 		expect(ctx.body).toEqual('{"error":"Test error"}');
 		expect(ctx.status).toEqual(404);
+		expect(next).toHaveBeenCalled();
 	});
 
 	test("Handles content negotiation", async () => {
@@ -43,5 +42,15 @@ describe("the response() middleware", () => {
 		ctx.body = "bla bla";
 		await response()(ctx, next);
 		expect(ctx.status).toEqual(406);
+		expect(next).not.toHaveBeenCalled();
+	});
+
+	test("Ignores charset specifications", async () => {
+		ctx.request.headers.accept = "application/json; charset=utf-8";
+		ctx.body = "test test";
+		await response()(ctx, next);
+		expect(ctx.status).toEqual(200);
+		expect(ctx.body).toEqual('{"data":"test test"}');
+		expect(next).toHaveBeenCalled();
 	});
 });
