@@ -1,4 +1,3 @@
-import UserModel from "db/models/user";
 import Koa from "koa";
 import mongoose from "mongoose";
 import crypto from "crypto";
@@ -8,9 +7,10 @@ import {
 	BasicAuthorizationRequest,
 	SignatureAuthorizationRequest
 } from "./schemes";
-import { includesAll } from "utils";
-import DeviceModel from "db/models/device";
-import { User } from "db/schemas/user";
+import UserModel from "quicksend-server/db/models/user";
+import { includesAll } from "quicksend-server/utils";
+import DeviceModel from "quicksend-server/db/models/device";
+import { User } from "quicksend-server/db/schemas/user";
 
 interface UserData {
 	id: mongoose.Types.ObjectId;

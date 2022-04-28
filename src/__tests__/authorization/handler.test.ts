@@ -1,17 +1,17 @@
-import authHandler from "authorization/handler";
+import authHandler from "quicksend-server/authorization/handler";
 import Koa from "koa";
 import mongoose from "mongoose";
 import crypto from "crypto";
-import { requireEnvVar } from "config";
-import { encodeBase64 } from "utils";
-import UserModel from "db/models/user";
+import { requireEnvVar } from "quicksend-server/config";
+import { encodeBase64 } from "quicksend-server/utils";
+import UserModel from "quicksend-server/db/models/user";
 import bcrypt from "bcryptjs";
 import {
 	catchMiddlewareErrors,
 	mockContext
-} from "__tests__/__utils__/koa_mock";
-import DeviceModel from "db/models/device";
-import { generateTestKeys } from "__tests__/__utils__/rsa";
+} from "quicksend-server/__tests__/__utils__/koa_mock";
+import DeviceModel from "quicksend-server/db/models/device";
+import { generateTestKeys } from "quicksend-server/__tests__/__utils__/rsa";
 
 describe("the authHandler() middleware for Basic auth", () => {
 	const handler = authHandler("Basic");

@@ -1,5 +1,5 @@
 import Koa from "koa";
-import errorHandler from "errors";
+import errorHandler from "quicksend-server/errors";
 import createContext from "koa-create-context";
 
 describe("the errorHandler() middleware", () => {
