@@ -1,9 +1,11 @@
 import UserModel from "src/db/models/user";
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
-import app from "src/server";
-import request from "supertest";
+import server from "src/server";
+import supertest from "supertest";
 import { requireEnvVar } from "src/utils";
+
+const request = supertest(server);
 
 describe("POST /user/create ", () => {
 	beforeAll(async () => {
@@ -20,7 +22,7 @@ describe("POST /user/create ", () => {
 	});
 
 	test("Correctly creates users", async () => {
-		const response = await request(app)
+		const response = await request
 			.post("/user/create")
 			.send({
 				username: "test-user",
@@ -50,7 +52,7 @@ describe("POST /user/create ", () => {
 		});
 		await user.save();
 
-		const response = await request(app)
+		const response = await request
 			.post("/user/create")
 			.send({ username: "test_user_2", password: "fgsdrtghfthjgz" })
 			.expect(400);
@@ -61,11 +63,11 @@ describe("POST /user/create ", () => {
 	});
 
 	test("Handles incomplete requests", async () => {
-		await request(app)
+		await request
 			.post("/user/create")
 			.send({ username: "tresfdhg" })
 			.expect(400);
-		await request(app)
+		await request
 			.post("/user/create")
 			.send({ password: "tresfdhg" })
 			.expect(400);
