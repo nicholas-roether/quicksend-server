@@ -45,7 +45,7 @@ describe("POST /device/add", () => {
 				signaturePublicKey: "sfdghhgjkkzlg",
 				encryptionPublicKey: "sdfghhjjghfk"
 			})
-			.auth(user.username, user.password)
+			.auth(user.username, user.password, { type: "basic" })
 			.expect(201);
 
 		const devices = await DeviceModel.find().exec();
