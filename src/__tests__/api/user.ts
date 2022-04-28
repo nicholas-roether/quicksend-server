@@ -28,12 +28,14 @@ describe("POST /user/create ", () => {
 				password: "password1234"
 			})
 			.set("Accept", "application/json; charset=utf-8")
-			.expect(201)
-			.expect("Content-Type", expect.stringContaining("application/json"));
+			.expect(201);
+		expect(response.get("Content-Type")).toEqual(
+			expect.stringContaining("application/json")
+		);
 
 		const users = await UserModel.find().exec();
 		expect(users.length).toBe(1);
-		const user = users[1];
+		const user = users[0];
 		expect(user.username).toBe("test-user");
 		expect(user.display).toBe("Test User");
 		expect(bcrypt.compareSync("password1234", user.passwordHash)).toBe(true);
