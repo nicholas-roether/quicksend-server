@@ -45,12 +45,20 @@ describe("the response() middleware", () => {
 		expect(next).not.toHaveBeenCalled();
 	});
 
-	test("Ignores charset specifications", async () => {
+	test("Handles utf-8 charset specifications", async () => {
 		ctx.request.headers.accept = "application/json; charset=utf-8";
 		ctx.body = "test test";
 		await response()(ctx, next);
 		expect(ctx.status).toEqual(200);
 		expect(ctx.body).toEqual('{"data":"test test"}');
 		expect(next).toHaveBeenCalled();
+	});
+
+	test("Handles non-utf-8 charset specifications", async () => {
+		ctx.request.headers.accept = "application/json; charset=utf16";
+		ctx.body = "test test";
+		await response()(ctx, next);
+		expect(ctx.status).toEqual(406);
+		expect(next).not.toHaveBeenCalled();
 	});
 });

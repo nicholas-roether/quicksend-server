@@ -11,6 +11,7 @@ describe("POST /user/create ", () => {
 	beforeAll(async () => {
 		await mongoose.disconnect();
 		await mongoose.connect(requireEnvVar("TEST_DB_URI"));
+		await mongoose.connection.db.dropDatabase();
 	});
 
 	afterAll(async () => {
