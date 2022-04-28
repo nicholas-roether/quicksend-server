@@ -11,8 +11,7 @@
 		"start": "ts-node ./src/server.ts --transpileOnly",
 		"dev": "ts-node-dev ./src/server.ts --inspect=4321 --respawn --transpile-only",
 		"lint": "eslint '.'",
-		"test": "jest",
-		"prepublishOnly": "tsc"
+		"test": "jest"
 	},
 	"devDependencies": {
 		"@types/bcryptjs": "^2.4.2",
