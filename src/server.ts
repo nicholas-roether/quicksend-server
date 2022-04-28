@@ -14,9 +14,12 @@ app.use(errorHandler());
 app.use(router.routes());
 app.use(router.allowedMethods());
 
-app.listen(process.env.PORT);
-console.log(`Listening on port ${process.env.PORT}`);
+const server = app.listen(process.env.PORT);
+
+console.log(`Listening on ${server.address()}`);
 
 mongoose
 	.connect(requireEnvVar("DB_URI"))
 	.then(() => console.log("Database connected"));
+
+export default server;
