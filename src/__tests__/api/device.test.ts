@@ -115,7 +115,7 @@ describe("POST /device/add", () => {
 		});
 	});
 
-	context("device with name already exists", () => {
+	context("device with name already exists for user", () => {
 		beforeEach(async () => {
 			const device = new DeviceModel({
 				name: "Test Device",
@@ -143,6 +143,46 @@ describe("POST /device/add", () => {
 			expect(device.type).to.equal(0);
 			expect(device.signaturePublicKey).not.to.equal("sfdghhgjkkzlg");
 			expect(device.encryptionPublicKey).not.to.equal("sdfghhjjghfk");
+		});
+	});
+
+	context("device with name exists for different user", () => {
+		beforeEach(async () => {
+			const testUser2 = new UserModel({
+				username: "test-user-2",
+				passwordHash: "r gdhzfjtjfhk"
+			});
+			const device = new DeviceModel({
+				name: "Test Device",
+				user: testUser2._id,
+				signaturePublicKey: "restghjgdf",
+				encryptionPublicKey: "tshghjghjf"
+			});
+			await device.save();
+		});
+
+		it("should add the new device", async () => {
+			const res = await request
+				.post("/device/add")
+				.send({
+					name: "Test Device",
+					signaturePublicKey: "sfdghhgjkkzlg",
+					encryptionPublicKey: "sdfghhjjghfk"
+				})
+				.auth(user.username, user.password, { type: "basic" })
+				.expect(201);
+
+			const devices = await DeviceModel.find().exec();
+			expect(devices.length).to.equal(2);
+			const device = devices[1];
+			expect(device.name).to.equal("Test Device");
+			expect(device.type).to.equal(0);
+			expect(device.signaturePublicKey).to.equal("sfdghhgjkkzlg");
+			expect(device.encryptionPublicKey).to.equal("sdfghhjjghfk");
+
+			expect(res.body).to.deep.equal({
+				data: { id: device._id.toHexString() }
+			});
 		});
 	});
 });
