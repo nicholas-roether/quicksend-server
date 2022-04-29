@@ -1,7 +1,10 @@
 {
-	"extension": [".test.ts"],
+	"require": "ts-node/register",
+	"loader": "ts-node/esm",
+	"extensions": ["ts"],
+	"spec": ["src/__tests__/**/*.test.*"],
+	"watch-files": ["src", "test", "tsconfig.json", "package.json", ".env", ".env.local"],
 	"watch-ignore": ["*.pnp.*", ".yarn", ".vscode", ".gitignore"],
-	"recursive": true,
 	"exit": true,
 	"ignore": ["./src/__tests__/__utils__/*.ts"]
 }
