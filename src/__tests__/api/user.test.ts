@@ -1,77 +1,89 @@
+import { expect } from "chai";
 import UserModel from "src/db/models/user";
-import mongoose from "mongoose";
-import bcrypt from "bcryptjs";
-import server from "src/server";
 import supertest from "supertest";
-import { requireEnvVar } from "src/utils";
+import bcrypt from "bcryptjs";
+import { createMongooseConnection } from "../__utils__/mongoose";
+import { createTestServer } from "../__utils__/server";
 
-const request = supertest(server);
+describe("POST /user/create", function () {
+	this.timeout(4000);
+	createMongooseConnection();
 
-describe("POST /user/create ", () => {
-	beforeAll(async () => {
-		await mongoose.disconnect();
-		await mongoose.connect(requireEnvVar("TEST_DB_URI"));
-		await mongoose.connection.db.dropDatabase();
+	let request: supertest.SuperTest<supertest.Test>;
+
+	before(() => {
+		request = supertest(createTestServer());
 	});
 
-	afterAll(async () => {
-		await mongoose.disconnect();
-	});
-
-	afterEach(async () => {
-		await mongoose.connection.db.dropDatabase();
-	});
-
-	test("Correctly creates users", async () => {
-		const response = await request
-			.post("/user/create")
-			.send({
-				username: "test-user",
-				display: "Test User",
-				password: "password1234"
-			})
-			.set("Accept", "application/json; charset=utf-8")
-			.expect(201);
-		expect(response.get("Content-Type")).toEqual(
-			expect.stringContaining("application/json")
-		);
-
+	it("should abort with 400 response if username is missing", async () => {
+		request.post("/user/create").send({ password: "1234" }).expect(400);
 		const users = await UserModel.find().exec();
-		console.log(users);
-		expect(users.length).toBe(1);
-		const user = users[0];
-		expect(user.username).toBe("test-user");
-		expect(user.display).toBe("Test User");
-		expect(bcrypt.compareSync("password1234", user.passwordHash)).toBe(true);
-
-		expect(response.body).toEqual({ data: { id: user._id.toHexString() } });
+		expect(users.length).to.equal(0);
 	});
 
-	test("Handles duplicate users", async () => {
-		const user = new UserModel({
-			username: "test_user_2",
-			passwordHash: "gsredtzdhrfgjf"
+	it("should abort with 400 response if password is missing", async () => {
+		request.post("/user/create").send({ username: "1234" }).expect(400);
+		const users = await UserModel.find().exec();
+		expect(users.length).to.equal(0);
+	});
+
+	context("no user with name exists", () => {
+		it("should create new user with username and password", async () => {
+			const res = await request
+				.post("/user/create")
+				.send({ username: "test-user", password: "password123" })
+				.expect(201);
+			expect(res.get("Content-Type")).to.contain("application/json");
+
+			const users = await UserModel.find().exec();
+			expect(users.length).to.equal(1);
+			const user = users[0];
+			expect(user.username).to.equal("test-user");
+			expect(bcrypt.compareSync("password123", user.passwordHash)).to.be.true;
+
+			expect(res.body).to.deep.equal({ data: { id: user._id.toHexString() } });
 		});
-		await user.save();
 
-		const response = await request
-			.post("/user/create")
-			.send({ username: "test_user_2", password: "fgsdrtghfthjgz" })
-			.expect(400);
+		it("should create new user with username, display name and password", async () => {
+			const res = await request
+				.post("/user/create")
+				.send({
+					username: "test-user-2",
+					display: "Test User #2",
+					password: "password1234"
+				})
+				.expect(201);
+			expect(res.get("Content-Type")).to.contain("application/json");
 
-		expect(response.body).toHaveProperty("error");
-		const users = await UserModel.find().exec();
-		expect(users.length).toBe(1);
+			const users = await UserModel.find().exec();
+			expect(users.length).to.equal(1);
+			const user = users[0];
+			expect(user.username).to.equal("test-user-2");
+			expect(user.display).to.equal("Test User #2");
+			expect(bcrypt.compareSync("password1234", user.passwordHash)).to.be.true;
+
+			expect(res.body).to.deep.equal({ data: { id: user._id.toHexString() } });
+		});
 	});
 
-	test("Handles incomplete requests", async () => {
-		await request
-			.post("/user/create")
-			.send({ username: "tresfdhg" })
-			.expect(400);
-		await request
-			.post("/user/create")
-			.send({ password: "tresfdhg" })
-			.expect(400);
+	context("user with name already exists", () => {
+		beforeEach(async () => {
+			const user = new UserModel({
+				username: "test_user_2",
+				passwordHash: "gsredtzdhrfgjf"
+			});
+			await user.save();
+		});
+
+		it("should return 400 and not create new users", async () => {
+			const response = await request
+				.post("/user/create")
+				.send({ username: "test_user_2", password: "fgsdrtghfthjgz" })
+				.expect(400);
+
+			expect(response.body).to.have.property("error");
+			const users = await UserModel.find().exec();
+			expect(users.length).to.equal(1);
+		});
 	});
 });

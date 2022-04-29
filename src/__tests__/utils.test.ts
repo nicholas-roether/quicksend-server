@@ -1,3 +1,4 @@
+import { expect } from "chai";
 import {
 	collapseWhitespace,
 	decodeBase64,
@@ -7,62 +8,64 @@ import {
 } from "src/utils";
 
 describe("collapseWhitespace()", () => {
-	test("makes no changes to a string containing no whitespace", () => {
+	it("should make no changes to a string containing no whitespace", () => {
 		const str = "ggfdjhntghjfkmtgufksdt35";
-		expect(collapseWhitespace(str)).toEqual(str);
+		expect(collapseWhitespace(str)).to.equal(str);
 	});
-	test("makes no changes to single whitespace characters", () => {
+	it("should make no changes to single whitespace characters", () => {
 		const str = "sgfgdsh tertrtz dsghgf";
-		expect(collapseWhitespace(str)).toEqual(str);
+		expect(collapseWhitespace(str)).to.equal(str);
 	});
-	test("correctly collapses whitespace", () => {
-		expect(collapseWhitespace("sdfg   fgdh  asds weerw   a")).toEqual(
+	it("should collapses whitespace", () => {
+		expect(collapseWhitespace("sdfg   fgdh  asds weerw   a")).to.equal(
 			"sdfg fgdh asds weerw a"
 		);
 	});
 
-	test("removes leading whitespace", () => {
-		expect(collapseWhitespace(" abc")).toEqual("abc");
-		expect(collapseWhitespace("   abc")).toEqual("abc");
+	it("should remove leading whitespace", () => {
+		expect(collapseWhitespace(" abc")).to.equal("abc");
+		expect(collapseWhitespace("   abc")).to.equal("abc");
 	});
 
-	test("removes trailing whitespace", () => {
-		expect(collapseWhitespace("abc ")).toEqual("abc");
-		expect(collapseWhitespace("abc   ")).toEqual("abc");
+	it("should remove trailing whitespace", () => {
+		expect(collapseWhitespace("abc ")).to.equal("abc");
+		expect(collapseWhitespace("abc   ")).to.equal("abc");
 	});
 });
 
 describe("splitAtIndex()", () => {
-	test("correctly splits around index", () => {
-		expect(splitAtIndex("abcde", 2)).toEqual(["ab", "de"]);
-		expect(splitAtIndex("abcde", 0)).toEqual(["", "bcde"]);
+	it("should correctly split around positive indecies", () => {
+		expect(splitAtIndex("abcde", 2)).to.deep.equal(["ab", "de"]);
 	});
-	test("correctly handles too high indecies", () => {
-		expect(splitAtIndex("abcde", 5)).toEqual(["abcde", ""]);
-		expect(splitAtIndex("abcde", 10)).toEqual(["abcde", ""]);
+	it("should handle splitting around zero", () => {
+		expect(splitAtIndex("abcde", 0)).to.deep.equal(["", "bcde"]);
 	});
-	test("correctly handles negative indecies", () => {
-		expect(splitAtIndex("abcde", -2)).toEqual(["abcde", ""]);
+	it("should handle too high indecies", () => {
+		expect(splitAtIndex("abcde", 5)).to.deep.equal(["abcde", ""]);
+		expect(splitAtIndex("abcde", 10)).to.deep.equal(["abcde", ""]);
+	});
+	it("should handle negative indecies", () => {
+		expect(splitAtIndex("abcde", -2)).to.deep.equal(["abcde", ""]);
 	});
 });
 
 describe("encodeBase64()", () => {
-	test("correctly encodes to base64", () => {
-		expect(encodeBase64("test test test")).toEqual("dGVzdCB0ZXN0IHRlc3Q=");
+	it("should produce correct base64 encodings", () => {
+		expect(encodeBase64("test test test")).to.equal("dGVzdCB0ZXN0IHRlc3Q=");
 	});
 });
 
 describe("decodeBase64()", () => {
-	test("correctly decodes base64", () => {
-		expect(decodeBase64("dGVzdCB0ZXN0IHRlc3Q")).toEqual("test test test");
+	it("should correctly decode base64", () => {
+		expect(decodeBase64("dGVzdCB0ZXN0IHRlc3Q")).to.equal("test test test");
 	});
 });
 
 describe("includesAll()", () => {
-	test("correctly recognizes subsets", () => {
-		expect(includesAll([1, 2, 3, 4], 3, 1)).toBe(true);
+	it("should recognize subsets", () => {
+		expect(includesAll([1, 2, 3, 4], 3, 1)).to.equal(true);
 	});
-	test("correctly recognizes unincluded items", () => {
-		expect(includesAll([1, 2, 3, 4], 5, 1)).toBe(false);
+	it("should recognize unincluded items", () => {
+		expect(includesAll([1, 2, 3, 4], 5, 1)).to.equal(false);
 	});
 });

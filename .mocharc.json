@@ -1,0 +1,7 @@
+{
+	"extension": [".test.ts"],
+	"watch-ignore": ["*.pnp.*", ".yarn", ".vscode", ".gitignore"],
+	"recursive": true,
+	"exit": true,
+	"ignore": ["./src/__tests__/__utils__/*.ts"]
+}

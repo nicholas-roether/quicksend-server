@@ -1,20 +1,9 @@
 import "./config";
-import Koa from "koa";
-import errorHandler from "./errors";
-import router from "./router";
-import responseHandler from "./response";
 import mongoose from "mongoose";
 import { requireEnvVar } from "./utils";
+import app from "./app";
 
-const app = new Koa();
-
-app.use(responseHandler());
-app.use(errorHandler());
-
-app.use(router.routes());
-app.use(router.allowedMethods());
-
-const server = app.listen(/* process.env.PORT */);
+const server = app.listen(process.env.PORT);
 const address = server.address();
 if (!address) {
 	console.error("An unexpected error occurred while starting the server");

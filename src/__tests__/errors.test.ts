@@ -1,44 +1,45 @@
 import Koa from "koa";
 import errorHandler from "src/errors";
 import createContext from "koa-create-context";
+import { SinonSpy, spy } from "sinon";
+import { expect } from "chai";
 
 describe("the errorHandler() middleware", () => {
 	let ctx: Koa.Context;
-	let next: Koa.Next;
+	let next: SinonSpy;
 
 	beforeEach(() => {
 		ctx = createContext();
-		next = jest.fn();
+		next = spy();
 	});
 
-	afterEach(() => {
-		expect(next).toHaveBeenCalled();
-	});
-
-	test("catches errors", async () => {
-		next = jest.fn(async () => {
+	it("should catch errors", async () => {
+		next = spy(() => {
 			throw new Error("test");
 		});
-		expect(() => errorHandler()(ctx, next)).not.toThrow();
+		expect(() => errorHandler()(ctx, next)).not.to.throw();
+		expect(next.calledOnce).to.be.true;
 	});
 
-	test("correctly handles thrown errors", async () => {
-		next = jest.fn(async () => {
+	it("should correctly output thrown error messages", async () => {
+		next = spy(() => {
 			throw new Error("test");
 		});
 		await errorHandler()(ctx, next);
-		expect(ctx.state.error).toEqual(true);
-		expect(ctx.body).toEqual("test");
-		expect(ctx.status).toEqual(500);
+		expect(ctx.state.error).to.be.true;
+		expect(ctx.body).to.equal("test");
+		expect(ctx.status).to.equal(500);
+		expect(next.calledOnce).to.be.true;
 	});
 
-	test("correctly handles http errors", async () => {
-		next = jest.fn(async () => {
+	it("should correctly output http error messages and status codes", async () => {
+		next = spy(() => {
 			ctx.throw(418, "test2");
 		});
 		await errorHandler()(ctx, next);
-		expect(ctx.state.error).toEqual(true);
-		expect(ctx.body).toEqual("test2");
-		expect(ctx.status).toEqual(418);
+		expect(ctx.state.error).to.be.true;
+		expect(ctx.body).to.equal("test2");
+		expect(ctx.status).to.equal(418);
+		expect(next.calledOnce).to.be.true;
 	});
 });

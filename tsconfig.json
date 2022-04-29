@@ -2,7 +2,7 @@
 	"compilerOptions": {
 		"target": "es2016",
 		"lib": [],
-		"types": ["node"],
+		"types": ["node", "mocha"],
 		"module": "commonjs",
 		"rootDir": "./src",
 		"paths": {

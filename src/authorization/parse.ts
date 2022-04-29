@@ -39,7 +39,7 @@ function parseAuthorizationParams(
 		if (!assignmentString) continue;
 		const res = assignmentString
 			.trim()
-			.match(/^([a-z0-9_-]+)=(?:"([^"]*)"|'([^']*)')$/i);
+			.match(/^([a-z0-9_-]+) *= *(?:"([^"]*)"|'([^']*)')$/i);
 		if (!res) return null;
 		const key = res[1];
 		const val = res[2] ?? res[3];

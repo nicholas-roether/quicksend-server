@@ -1,4 +1,5 @@
 import Koa from "koa";
+import { SinonSpy, spy } from "sinon";
 import createContext from "koa-create-context";
 
 class MockMiddlewareThrow extends Error {
@@ -7,12 +8,15 @@ class MockMiddlewareThrow extends Error {
 	}
 }
 
-function mockContext(): Koa.Context {
+type MockContext = Koa.ParameterizedContext & { throw: SinonSpy };
+
+function mockContext(): MockContext {
 	const ctx = createContext();
-	ctx.throw = jest.fn(() => {
+	ctx.throw = spy(() => {
 		throw new MockMiddlewareThrow();
 	});
-	return ctx;
+	ctx.request.body = undefined;
+	return ctx as MockContext;
 }
 
 async function catchMiddlewareErrors(
@@ -28,3 +32,4 @@ async function catchMiddlewareErrors(
 }
 
 export { mockContext, catchMiddlewareErrors };
+export type { MockContext };

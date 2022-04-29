@@ -1,38 +1,43 @@
+import { expect } from "chai";
 import Joi from "joi";
-import Koa from "koa";
+import { SinonSpy, spy } from "sinon";
 import bodyValidator from "src/body_validator";
-import { mockContext, catchMiddlewareErrors } from "./__utils__/koa_mock";
+import {
+	mockContext,
+	catchMiddlewareErrors,
+	MockContext
+} from "./__utils__/koa_mock";
 
 const testSchema = Joi.object({
 	val: Joi.number().required()
 });
 
 describe("the bodyValidator() middleware", () => {
-	let ctx: Koa.Context;
-	let next: Koa.Next;
+	let ctx: MockContext;
+	let next: SinonSpy;
 
 	beforeEach(() => {
 		ctx = mockContext();
-		next = jest.fn();
+		next = spy();
 	});
 
-	test("correctly handles empty request bodies", async () => {
+	it("should throw error on empty request body", async () => {
 		await catchMiddlewareErrors(bodyValidator(testSchema), ctx, next);
-		expect(ctx.throw).toHaveBeenCalledWith(400, expect.any(String));
-		expect(next).not.toHaveBeenCalled();
+		expect(ctx.throw.calledOnceWith(400)).to.be.true;
+		expect(next.called).to.be.false;
 	});
 
-	test("correctly handles correct requests", () => {
+	it("should pass on correct request bodies", () => {
 		ctx.request.body = { val: 69 };
 		bodyValidator(testSchema)(ctx, next);
-		expect(ctx.status).toEqual(200);
-		expect(next).toHaveBeenCalled();
+		expect(ctx.status).to.equal(200);
+		expect(next.calledOnce).to.be.true;
 	});
 
-	test("correctly handles incorrect requests", async () => {
+	it("should throw on incorrect request bodies", async () => {
 		ctx.request.body = { val: "hi!" };
 		await catchMiddlewareErrors(bodyValidator(testSchema), ctx, next);
-		expect(ctx.throw).toHaveBeenCalledWith(400, expect.anything());
-		expect(next).not.toHaveBeenCalled();
+		expect(ctx.throw.calledOnceWith(400)).to.be.true;
+		expect(next.called).to.be.false;
 	});
 });

@@ -1,104 +1,20 @@
 import "src/config";
 import authHandler from "src/authorization/handler";
-import Koa from "koa";
 import mongoose from "mongoose";
 import crypto from "crypto";
-import { encodeBase64, requireEnvVar } from "src/utils";
+import { encodeBase64 } from "src/utils";
 import UserModel from "src/db/models/user";
 import bcrypt from "bcryptjs";
 import {
 	catchMiddlewareErrors,
+	MockContext,
 	mockContext
 } from "src/__tests__/__utils__/koa_mock";
 import DeviceModel from "src/db/models/device";
 import { generateTestKeys } from "src/__tests__/__utils__/rsa";
-
-describe("the authHandler() middleware for Basic auth", () => {
-	const handler = authHandler("Basic");
-	let ctx: Koa.Context;
-	let next: Koa.Next;
-
-	beforeAll(async () => {
-		await mongoose.connect(requireEnvVar("TEST_DB_URI"));
-	});
-
-	afterAll(async () => {
-		await mongoose.disconnect();
-	});
-
-	beforeEach(() => {
-		ctx = mockContext();
-		next = jest.fn();
-	});
-
-	afterEach(async () => {
-		await mongoose.connection.db.dropDatabase();
-	});
-
-	test("Correctly handles unauthorized requests", async () => {
-		await catchMiddlewareErrors(handler, ctx, next);
-		expect(ctx.throw).toHaveBeenCalledWith(401, expect.any(String));
-		expect(ctx.state.user).toBeUndefined();
-		expect(ctx.response.header["www-authenticate"]).toMatch(/^Basic/);
-		expect(next).not.toHaveBeenCalled();
-	});
-
-	test("Correctly handles malformed authorization headers", async () => {
-		ctx.request.header.authorization = "dhtzhfjjhgfkguizk";
-		await catchMiddlewareErrors(handler, ctx, next);
-		expect(ctx.throw).toHaveBeenCalledWith(400, expect.any(String));
-		expect(ctx.state.user).toBeUndefined();
-		expect(next).not.toHaveBeenCalled();
-	});
-
-	test("Correctly handles malformed authorization parameters", async () => {
-		ctx.request.header.authorization = "Basic trhjghfjfghjkm";
-		await catchMiddlewareErrors(handler, ctx, next);
-		expect(ctx.throw).toHaveBeenCalledWith(400, expect.any(String));
-		expect(ctx.state.user).toBeUndefined();
-		expect(next).not.toHaveBeenCalled();
-	});
-
-	test("Correctly handles unknown usernames", async () => {
-		ctx.request.header.authorization =
-			"Basic " + encodeBase64("test-user:password123");
-		await catchMiddlewareErrors(handler, ctx, next);
-		expect(ctx.throw).toHaveBeenCalledWith(400, expect.any(String));
-		expect(ctx.state.user).toBeUndefined();
-		expect(next).not.toHaveBeenCalled();
-	});
-
-	test("Correctly handles invalid passwords", async () => {
-		const testUser = new UserModel({
-			username: "testuser1234",
-			passwordHash: bcrypt.hashSync("password1234", 10)
-		});
-		await testUser.save();
-		ctx.request.header.authorization =
-			"Basic " + encodeBase64("testuser1234:password123");
-		await catchMiddlewareErrors(handler, ctx, next);
-		expect(ctx.throw).toHaveBeenCalledWith(401, expect.any(String));
-		expect(ctx.state.user).toBeUndefined();
-		expect(next).not.toHaveBeenCalled();
-	});
-
-	test("Correctly handles correct credentials", async () => {
-		const testUser = new UserModel({
-			username: "testuser1234",
-			passwordHash: bcrypt.hashSync("password1234", 10)
-		});
-		await testUser.save();
-		ctx.request.header.authorization =
-			"Basic " + encodeBase64("testuser1234:password1234");
-		await handler(ctx, next);
-		expect(ctx.state.user).toEqual({
-			id: testUser._id,
-			username: "testuser1234",
-			display: undefined
-		});
-		expect(next).toHaveBeenCalled();
-	});
-});
+import { SinonSpy, spy } from "sinon";
+import { createMongooseConnection } from "../__utils__/mongoose";
+import { expect } from "chai";
 
 async function createTestUser() {
 	const user = new UserModel({
@@ -123,154 +39,304 @@ async function createTestDevice(
 	return device;
 }
 
-describe("the authHandler() middleware for Signature auth", () => {
-	const handler = authHandler();
-	let ctx: Koa.Context;
-	let next: Koa.Next;
+describe("the authHandler() middleware", function () {
+	this.timeout(4000);
 
-	beforeAll(async () => {
-		await mongoose.connect(requireEnvVar("TEST_DB_URI"));
-	});
+	let ctx: MockContext;
+	let next: SinonSpy;
 
-	afterAll(async () => {
-		await mongoose.disconnect();
-	});
+	createMongooseConnection();
 
-	beforeEach(async () => {
+	beforeEach(() => {
 		ctx = mockContext();
-		next = jest.fn();
+		next = spy();
 	});
 
-	afterEach(async () => {
-		await mongoose.connection.db.dropDatabase();
-	});
-
-	test("Correctly handles unauthorized requests", async () => {
-		await catchMiddlewareErrors(handler, ctx, next);
-		expect(ctx.throw).toBeCalledWith(401, expect.any(String));
-		expect(ctx.state.user).toBeUndefined();
-		expect(ctx.response.header["www-authenticate"]).toMatch(/^Signature/);
-		expect(next).not.toHaveBeenCalled();
-	});
-
-	test("Correctly handles malformed authorization headers", async () => {
-		ctx.request.header["authorization"] = "gdrfhthfkjkjhlölköj";
-		await catchMiddlewareErrors(handler, ctx, next);
-		expect(ctx.throw).toHaveBeenCalledWith(400, expect.any(String));
-		expect(ctx.state.user).toBeUndefined();
-		expect(next).not.toHaveBeenCalled();
-	});
-
-	test("Correctly handles malformed authorization parameters", async () => {
-		ctx.request.header["authorization"] = "Signature val='3";
-		await catchMiddlewareErrors(handler, ctx, next);
-		expect(ctx.throw).toHaveBeenCalledWith(400, expect.any(String));
-		expect(ctx.state.user).toBeUndefined();
-		expect(next).not.toHaveBeenCalled();
-	});
-
-	test("Correcly verifies correct signatures", async () => {
-		const keyPair = generateTestKeys();
-
-		const user = await createTestUser();
-		const device = await createTestDevice(user._id, keyPair);
-
-		const date = new Date();
-		const signatureStr = `(request-target): get /test\ndate: ${date.toUTCString()}\n`;
-		const signature = crypto
-			.sign(null, Buffer.from(signatureStr), keyPair.privateKey)
-			.toString("base64");
-
-		ctx.url = "/test";
-		ctx.method = "GET";
-		ctx.request.header.date = date.toUTCString();
-		ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}"`;
-
-		await catchMiddlewareErrors(handler, ctx, next);
-		expect(ctx.throw).not.toHaveBeenCalled();
-		expect(ctx.state.user).toEqual({
-			id: user._id,
-			username: user.username,
-			display: user.display
+	describe("Basic authorization", () => {
+		it("should abort with a 401 response and send appropriate WWW-Authenticate header on requests without an authorization header", async () => {
+			await catchMiddlewareErrors(authHandler("Basic"), ctx, next);
+			expect(ctx.throw.calledOnceWith(401)).to.be.true;
+			expect(ctx.state.user).to.be.undefined;
+			expect(ctx.response.header["www-authenticate"]).to.match(/^Basic/);
+			expect(next.called).to.be.false;
 		});
-		expect(next).toHaveBeenCalled();
-	});
 
-	test("Correctly handles malformed object ids", async () => {
-		ctx.request.header.authorization = 'Signature keyId="fsdgfdg"';
-		await catchMiddlewareErrors(handler, ctx, next);
-		expect(ctx.throw).toHaveBeenCalledWith(400, expect.any(String));
-		expect(next).not.toHaveBeenCalled();
-	});
-
-	test("Corretly handles non-existent devices", async () => {
-		const keyPair = generateTestKeys();
-
-		const date = new Date();
-		const signatureStr = `(request-target): post /test\ndate: ${date.toUTCString()}\n`;
-		const signature = crypto
-			.sign(null, Buffer.from(signatureStr), keyPair.privateKey)
-			.toString("base64");
-
-		ctx.url = "/test";
-		ctx.method = "POST";
-		ctx.request.header.date = date.toUTCString();
-		ctx.request.header.authorization = `Signature keyId="${new mongoose.Types.ObjectId().toHexString()}",signature="${signature}"`;
-
-		await catchMiddlewareErrors(handler, ctx, next);
-		expect(ctx.throw).toHaveBeenCalledWith(401, expect.any(String));
-		expect(ctx.state.user).toBeUndefined();
-		expect(next).not.toHaveBeenCalled();
-	});
-
-	test("Correctly handles invalid signatures", async () => {
-		const keyPair = generateTestKeys();
-
-		const user = await createTestUser();
-		const device = await createTestDevice(user._id, keyPair);
-
-		const date = new Date();
-		const signatureStr = `tzuztuikdfgdhfguhrstztfzuj`;
-		const signature = crypto
-			.sign(null, Buffer.from(signatureStr), keyPair.privateKey)
-			.toString("base64");
-
-		ctx.url = "/test";
-		ctx.method = "GET";
-		ctx.request.header.date = date.toUTCString();
-		ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}"`;
-
-		await catchMiddlewareErrors(handler, ctx, next);
-		expect(ctx.throw).toHaveBeenCalledWith(401, expect.any(String));
-		expect(ctx.state.user).toBeUndefined();
-		expect(next).not.toHaveBeenCalled();
-	});
-
-	test("Allows specifying custom headers", async () => {
-		const keyPair = generateTestKeys();
-
-		const user = await createTestUser();
-		const device = await createTestDevice(user._id, keyPair);
-
-		const date = new Date();
-		const signatureStr = `(request-target): get /test\ndate: ${date.toUTCString()}\nx-test: test\n`;
-		const signature = crypto
-			.sign(null, Buffer.from(signatureStr), keyPair.privateKey)
-			.toString("base64");
-
-		ctx.url = "/test";
-		ctx.method = "GET";
-		ctx.request.header.date = date.toUTCString();
-		ctx.request.header["x-test"] = "test";
-		ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}",headers="(request-target) date x-test"`;
-
-		await catchMiddlewareErrors(handler, ctx, next);
-		expect(ctx.throw).not.toHaveBeenCalled();
-		expect(ctx.state.user).toEqual({
-			id: user._id,
-			username: user.username,
-			display: user.display
+		it("should abort with a 400 response when the authorization header does not begin with 'Basic'", async () => {
+			ctx.request.header.authorization = "dhtzhfjjhgfkguizk";
+			await catchMiddlewareErrors(authHandler("Basic"), ctx, next);
+			expect(ctx.throw.calledOnceWith(400)).to.be.true;
+			expect(ctx.state.user).to.be.undefined;
+			expect(next.called).to.be.false;
 		});
-		expect(next).toHaveBeenCalled();
+
+		it("should abort with a 400 response when the authorization token is malformed", async () => {
+			ctx.request.header.authorization = "Basic dhtzhfjjhgfkguizk";
+			await catchMiddlewareErrors(authHandler("Basic"), ctx, next);
+			expect(ctx.throw.calledOnceWith(400)).to.be.true;
+			expect(ctx.state.user).to.be.undefined;
+			expect(next.called).to.be.false;
+		});
+
+		it("should abort with a 400 response for unknown usernames", async () => {
+			ctx.request.header.authorization =
+				"Basic " + encodeBase64("test-user:password123");
+			await catchMiddlewareErrors(authHandler("Basic"), ctx, next);
+			expect(ctx.throw.calledOnceWith(400)).to.be.true;
+			expect(ctx.state.user).to.be.undefined;
+			expect(next.called).to.be.false;
+		});
+
+		it("should abort with a 401 response for invalid passwords", async () => {
+			const testUser = new UserModel({
+				username: "testuser1234",
+				passwordHash: bcrypt.hashSync("password1234", 10)
+			});
+			await testUser.save();
+			ctx.request.header.authorization =
+				"Basic " + encodeBase64("testuser1234:password123");
+			await catchMiddlewareErrors(authHandler("Basic"), ctx, next);
+			expect(ctx.throw.calledOnceWith(401)).to.be.true;
+			expect(ctx.state.user).to.be.undefined;
+			expect(next.called).to.be.false;
+		});
+
+		it("should authorize requests with correct credentials", async () => {
+			const testUser = new UserModel({
+				username: "testuser1234",
+				passwordHash: bcrypt.hashSync("password1234", 10)
+			});
+			await testUser.save();
+			ctx.request.header.authorization =
+				"Basic " + encodeBase64("testuser1234:password1234");
+			await catchMiddlewareErrors(authHandler("Basic"), ctx, next);
+			expect(ctx.status).to.equal(200);
+			expect(ctx.state.user).to.deep.equal({
+				id: testUser._id,
+				username: "testuser1234",
+				display: undefined
+			});
+			expect(next.calledOnce).to.be.true;
+		});
+	});
+
+	describe("Signature authorization", () => {
+		it("should abort with a 401 response and send appropriate WWW-Authenticate header on requests without an authorization header", async () => {
+			await catchMiddlewareErrors(authHandler(), ctx, next);
+			expect(ctx.throw.calledOnceWith(401)).to.be.true;
+			expect(ctx.state.user).to.be.undefined;
+			expect(ctx.response.header["www-authenticate"]).to.match(/^Signature/);
+			expect(next.called).to.be.false;
+		});
+
+		it("should abort with a 400 response when the authorization header does not begin with 'Signature'", async () => {
+			ctx.request.header.authorization = "dhtzhfjjhgfkguizk";
+			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
+			expect(ctx.throw.calledOnceWith(400)).to.be.true;
+			expect(ctx.state.user).to.be.undefined;
+			expect(next.called).to.be.false;
+		});
+
+		it("should abort with a 400 response when the authorization parameters are malformed", async () => {
+			ctx.request.header.authorization =
+				"Signature keyId='ghfhgjgj',signature='sgfd\"";
+			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
+			expect(ctx.throw.calledOnceWith(400)).to.be.true;
+			expect(ctx.state.user).to.be.undefined;
+			expect(next.called).to.be.false;
+		});
+
+		it("should abort with a 401 response when the device id used isn't registered", async () => {
+			const keyPair = generateTestKeys();
+
+			const date = new Date();
+			const signatureStr = `(request-target): post /test\ndate: ${date.toUTCString()}\n`;
+			const signature = crypto
+				.sign(null, Buffer.from(signatureStr), keyPair.privateKey)
+				.toString("base64");
+
+			ctx.url = "/test";
+			ctx.method = "POST";
+			ctx.request.header.date = date.toUTCString();
+			ctx.request.header.authorization = `Signature keyId="${new mongoose.Types.ObjectId().toHexString()}",signature="${signature}"`;
+
+			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
+			expect(ctx.throw.calledOnceWith(401)).to.be.true;
+			expect(ctx.state.user).to.be.undefined;
+			expect(next.called).to.be.false;
+		});
+
+		it("should abort with a 400 response when the device id used is not a valid object id", async () => {
+			ctx.request.header.authorization = 'Signature keyId="fsdgfdg"';
+			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
+			expect(ctx.throw.calledOnceWith(400)).to.be.true;
+			expect(next.called).to.be.false;
+		});
+
+		it("should abort with a 401 response when the signature recieved is invalid", async () => {
+			const keyPair = generateTestKeys();
+
+			const user = await createTestUser();
+			const device = await createTestDevice(user._id, keyPair);
+
+			const date = new Date();
+			const signatureStr = `tzuztuikdfgdhfguhrstztfzuj`;
+			const signature = crypto
+				.sign(null, Buffer.from(signatureStr), keyPair.privateKey)
+				.toString("base64");
+
+			ctx.url = "/test";
+			ctx.method = "GET";
+			ctx.request.header.date = date.toUTCString();
+			ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}"`;
+
+			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
+			expect(ctx.throw.calledOnceWith(401)).to.be.true;
+			expect(ctx.state.user).to.be.undefined;
+			expect(next.called).to.be.false;
+		});
+		it("should not authorize requests from the future", async () => {
+			const keyPair = generateTestKeys();
+
+			const user = await createTestUser();
+			const device = await createTestDevice(user._id, keyPair);
+
+			const date = new Date(Date.now() + 10000);
+			const signatureStr = `(request-target): post /test\ndate: ${date.toUTCString()}\n`;
+			const signature = crypto
+				.sign(null, Buffer.from(signatureStr), keyPair.privateKey)
+				.toString("base64");
+
+			ctx.url = "/test";
+			ctx.method = "GET";
+			ctx.request.header.date = date.toUTCString();
+			ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}"`;
+
+			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
+			expect(ctx.throw.calledOnceWith(401)).to.be.true;
+			expect(ctx.state.user).to.be.undefined;
+			expect(next.called).to.be.false;
+		});
+
+		it("should not authorize requests older than 1 second", async () => {
+			const keyPair = generateTestKeys();
+
+			const user = await createTestUser();
+			const device = await createTestDevice(user._id, keyPair);
+
+			const date = new Date(Date.now() - 1000);
+			const signatureStr = `(request-target): post /test\ndate: ${date.toUTCString()}\n`;
+			const signature = crypto
+				.sign(null, Buffer.from(signatureStr), keyPair.privateKey)
+				.toString("base64");
+
+			ctx.url = "/test";
+			ctx.method = "GET";
+			ctx.request.header.date = date.toUTCString();
+			ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}"`;
+
+			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
+			expect(ctx.throw.calledOnceWith(401)).to.be.true;
+			expect(ctx.state.user).to.be.undefined;
+			expect(next.called).to.be.false;
+		});
+
+		it("should authorize requests with correct signatures", async () => {
+			const keyPair = generateTestKeys();
+
+			const user = await createTestUser();
+			const device = await createTestDevice(user._id, keyPair);
+
+			const date = new Date();
+			const signatureStr = `(request-target): get /test\ndate: ${date.toUTCString()}\n`;
+			const signature = crypto
+				.sign(null, Buffer.from(signatureStr), keyPair.privateKey)
+				.toString("base64");
+
+			ctx.url = "/test";
+			ctx.method = "GET";
+			ctx.request.header.date = date.toUTCString();
+			ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}"`;
+
+			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
+			expect(ctx.throw.called).to.be.false;
+			expect(ctx.state.user).to.deep.equal({
+				id: user._id,
+				username: user.username,
+				display: user.display
+			});
+			expect(next.calledOnce).to.be.true;
+		});
+
+		it("should allow specification of custom signed headers", async () => {
+			const keyPair = generateTestKeys();
+
+			const user = await createTestUser();
+			const device = await createTestDevice(user._id, keyPair);
+
+			const date = new Date();
+			const signatureStr = `(request-target): get /test\ndate: ${date.toUTCString()}\nx-test: test\n`;
+			const signature = crypto
+				.sign(null, Buffer.from(signatureStr), keyPair.privateKey)
+				.toString("base64");
+
+			ctx.url = "/test";
+			ctx.method = "GET";
+			ctx.request.header.date = date.toUTCString();
+			ctx.request.header["x-test"] = "test";
+			ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}",headers="(request-target) date x-test"`;
+
+			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
+			expect(ctx.throw.called).to.be.false;
+			expect(ctx.state.user).to.deep.equal({
+				id: user._id,
+				username: user.username,
+				display: user.display
+			});
+			expect(next.calledOnce).to.be.true;
+		});
+
+		it("Should require the request target to be included in the signature string", async () => {
+			const keyPair = generateTestKeys();
+
+			const user = await createTestUser();
+			const device = await createTestDevice(user._id, keyPair);
+
+			const date = new Date();
+			const signatureStr = `date: ${date.toUTCString()}\n`;
+			const signature = crypto
+				.sign(null, Buffer.from(signatureStr), keyPair.privateKey)
+				.toString("base64");
+
+			ctx.url = "/test";
+			ctx.method = "GET";
+			ctx.request.header.date = date.toUTCString();
+			ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}",headers="date"`;
+
+			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
+			expect(ctx.throw.calledOnceWith(400)).to.be.true;
+			expect(ctx.state.user).to.be.undefined;
+			expect(next.called).to.be.false;
+		});
+
+		it("Should require the date header to be included in the signature string", async () => {
+			const keyPair = generateTestKeys();
+
+			const user = await createTestUser();
+			const device = await createTestDevice(user._id, keyPair);
+
+			const signatureStr = `(request-target): get /test`;
+			const signature = crypto
+				.sign(null, Buffer.from(signatureStr), keyPair.privateKey)
+				.toString("base64");
+
+			ctx.url = "/test";
+			ctx.method = "GET";
+			ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}",headers="(request-target)"`;
+
+			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
+			expect(ctx.throw.calledOnceWith(400)).to.be.true;
+			expect(ctx.state.user).to.be.undefined;
+			expect(next.called).to.be.false;
+		});
 	});
 });
