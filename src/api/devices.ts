@@ -4,7 +4,7 @@ import authHandler, { UserData } from "src/authorization/handler";
 import bodyValidator from "src/body_validator";
 import DeviceModel from "src/db/models/device";
 
-const device = new Router({ prefix: "/device" });
+const devices = new Router({ prefix: "/devices" });
 
 interface AddDeviceRequest {
 	name: string;
@@ -23,7 +23,7 @@ const addDeviceSchema = Joi.object<AddDeviceRequest>({
 	encryptionPublicKey: Joi.string().required()
 });
 
-device.post(
+devices.post(
 	"/add",
 	authHandler("Basic"),
 	bodyValidator(addDeviceSchema),
@@ -56,7 +56,7 @@ const removeDeviceSchema = Joi.object<RemoveDeviceRequest>({
 	id: Joi.string().required()
 });
 
-device.post(
+devices.post(
 	"/remove",
 	authHandler(),
 	bodyValidator(removeDeviceSchema),
@@ -77,7 +77,7 @@ device.post(
 	}
 );
 
-device.get("/list", authHandler(), async (ctx, next) => {
+devices.get("/list", authHandler(), async (ctx, next) => {
 	const userData = ctx.state.user as UserData;
 
 	const devices = await DeviceModel.find({ user: userData.id })
@@ -94,4 +94,4 @@ device.get("/list", authHandler(), async (ctx, next) => {
 	return next();
 });
 
-export default device;
+export default devices;

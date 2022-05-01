@@ -1,11 +1,11 @@
 import Router from "@koa/router";
 import user from "./api/user";
-import device from "./api/device";
+import devices from "./api/devices";
 import bodyParser from "koa-bodyparser";
 
 const router = new Router();
 router.use(bodyParser());
 router.use(user.routes(), user.allowedMethods());
-router.use(device.routes(), device.allowedMethods());
+router.use(devices.routes(), devices.allowedMethods());
 
 export default router;

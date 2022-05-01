@@ -11,7 +11,7 @@ import { generateTestKeys } from "../__utils__/rsa";
 import { createTestServer } from "../__utils__/server";
 import { createTestSignatureGenerator } from "../__utils__/signature";
 
-describe("POST /device/add", () => {
+describe("POST /devices/add", () => {
 	createMongooseConnection();
 
 	let request: supertest.SuperTest<supertest.Test>;
@@ -22,7 +22,7 @@ describe("POST /device/add", () => {
 
 	it("should not accept unauthorized requests and respond with 401", async () => {
 		await request
-			.post("/device/add")
+			.post("/devices/add")
 			.send({
 				name: "test",
 				signaturePublicKey: "sfaggfdhs",
@@ -53,7 +53,7 @@ describe("POST /device/add", () => {
 
 		it("should require a value for name", async () => {
 			await request
-				.post("/device/add")
+				.post("/devices/add")
 				.send({
 					signaturePublicKey: "sfaggfdhs",
 					encryptionPublicKey: "sghdffdghjhfgdj"
@@ -64,7 +64,7 @@ describe("POST /device/add", () => {
 
 		it("should require a value for signaturePublicKey", async () => {
 			await request
-				.post("/device/add")
+				.post("/devices/add")
 				.send({
 					name: "sfaggfdhs",
 					encryptionPublicKey: "sghdffdghjhfgdj"
@@ -75,7 +75,7 @@ describe("POST /device/add", () => {
 
 		it("should require a value for encryptionPublicKey", async () => {
 			await request
-				.post("/device/add")
+				.post("/devices/add")
 				.send({
 					name: "sdfdsgfh",
 					signaturePublicKey: "sfaggfdhs"
@@ -87,7 +87,7 @@ describe("POST /device/add", () => {
 		context("device with name does not exist", () => {
 			it("should add device with name and public keys", async () => {
 				const res = await request
-					.post("/device/add")
+					.post("/devices/add")
 					.send({
 						name: "Test Device",
 						signaturePublicKey: "sfdghhgjkkzlg",
@@ -111,7 +111,7 @@ describe("POST /device/add", () => {
 
 			it("should add device with name, type and public keys", async () => {
 				const res = await request
-					.post("/device/add")
+					.post("/devices/add")
 					.send({
 						name: "Test Device",
 						type: 2,
@@ -147,7 +147,7 @@ describe("POST /device/add", () => {
 			});
 			it("should return a 400 response and not add a device", async () => {
 				await request
-					.post("/device/add")
+					.post("/devices/add")
 					.send({
 						name: "Test Device",
 						signaturePublicKey: "sfdghhgjkkzlg",
@@ -183,7 +183,7 @@ describe("POST /device/add", () => {
 
 			it("should add the new device", async () => {
 				const res = await request
-					.post("/device/add")
+					.post("/devices/add")
 					.send({
 						name: "Test Device",
 						signaturePublicKey: "sfdghhgjkkzlg",
@@ -208,7 +208,7 @@ describe("POST /device/add", () => {
 	});
 });
 
-describe("POST /device/remove", function () {
+describe("POST /devices/remove", function () {
 	createMongooseConnection();
 	let request: supertest.SuperTest<supertest.Test>;
 
@@ -225,7 +225,7 @@ describe("POST /device/remove", function () {
 		});
 		await deviceDoc.save();
 		await request
-			.post("/device/remove")
+			.post("/devices/remove")
 			.send({ id: deviceDoc._id.toHexString() })
 			.expect(401);
 		const devices = await DeviceModel.find().exec();
@@ -233,7 +233,7 @@ describe("POST /device/remove", function () {
 	});
 
 	context("with Signature authorization", () => {
-		const genSignature = createTestSignatureGenerator("post /device/remove");
+		const genSignature = createTestSignatureGenerator("post /devices/remove");
 
 		const deviceKeyPair = generateTestKeys();
 		let user: User;
@@ -259,7 +259,7 @@ describe("POST /device/remove", function () {
 		it("should respond with 400 to requests that don't provide an id", async () => {
 			const date = new Date();
 			await request
-				.post("/device/remove")
+				.post("/devices/remove")
 				.set("Date", date.toUTCString())
 				.set(
 					"Authorization",
@@ -280,7 +280,7 @@ describe("POST /device/remove", function () {
 
 			const date = new Date();
 			await request
-				.post("/device/remove")
+				.post("/devices/remove")
 				.set("Date", date.toUTCString())
 				.set(
 					"Authorization",
@@ -297,7 +297,7 @@ describe("POST /device/remove", function () {
 		it("should be able to remove the current device itself", async () => {
 			const date = new Date();
 			await request
-				.post("/device/remove")
+				.post("/devices/remove")
 				.set("Date", date.toUTCString())
 				.set(
 					"Authorization",
@@ -313,7 +313,7 @@ describe("POST /device/remove", function () {
 		it("should respond with 400 for non-existent device ids", async () => {
 			const date = new Date();
 			await request
-				.post("/device/remove")
+				.post("/devices/remove")
 				.set("Date", date.toUTCString())
 				.set(
 					"Authorization",
@@ -334,7 +334,7 @@ describe("POST /device/remove", function () {
 
 			const date = new Date();
 			await request
-				.post("/device/remove")
+				.post("/devices/remove")
 				.set("Date", date.toUTCString())
 				.set(
 					"Authorization",
