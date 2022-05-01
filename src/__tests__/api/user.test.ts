@@ -6,7 +6,6 @@ import { createMongooseConnection } from "../__utils__/mongoose";
 import { createTestServer } from "../__utils__/server";
 
 describe("POST /user/create", function () {
-	this.timeout(4000);
 	createMongooseConnection();
 
 	let request: supertest.SuperTest<supertest.Test>;

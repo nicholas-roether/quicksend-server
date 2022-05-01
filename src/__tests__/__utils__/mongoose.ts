@@ -13,7 +13,6 @@ function createMongooseConnection() {
 	});
 
 	afterEach(async function () {
-		this.timeout(3000);
 		await mongoose.connection.db.dropDatabase();
 	});
 }

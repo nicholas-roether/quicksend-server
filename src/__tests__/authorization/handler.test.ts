@@ -40,8 +40,6 @@ async function createTestDevice(
 }
 
 describe("the authHandler() middleware", function () {
-	this.timeout(4000);
-
 	let ctx: MockContext;
 	let next: SinonSpy;
 
@@ -120,6 +118,8 @@ describe("the authHandler() middleware", function () {
 	});
 
 	describe("Signature authorization", () => {
+		const keyPair = generateTestKeys();
+
 		it("should abort with a 401 response and send appropriate WWW-Authenticate header on requests without an authorization header", async () => {
 			await catchMiddlewareErrors(authHandler(), ctx, next);
 			expect(ctx.throw.calledOnceWith(401)).to.be.true;
@@ -146,8 +146,6 @@ describe("the authHandler() middleware", function () {
 		});
 
 		it("should abort with a 401 response when the device id used isn't registered", async () => {
-			const keyPair = generateTestKeys();
-
 			const date = new Date();
 			const signatureStr = `(request-target): post /test\ndate: ${date.toUTCString()}\n`;
 			const signature = crypto
@@ -157,7 +155,7 @@ describe("the authHandler() middleware", function () {
 			ctx.url = "/test";
 			ctx.method = "POST";
 			ctx.request.header.date = date.toUTCString();
-			ctx.request.header.authorization = `Signature keyId="${new mongoose.Types.ObjectId().toHexString()}",signature="${signature}"`;
+			ctx.request.header.authorization = `Signature keyId="${new mongoose.Types.ObjectId().toHexString()}",signature="${signature}",headers="(request-target) date"`;
 
 			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
 			expect(ctx.throw.calledOnceWith(401)).to.be.true;
@@ -173,8 +171,6 @@ describe("the authHandler() middleware", function () {
 		});
 
 		it("should abort with a 401 response when the signature recieved is invalid", async () => {
-			const keyPair = generateTestKeys();
-
 			const user = await createTestUser();
 			const device = await createTestDevice(user._id, keyPair);
 
@@ -187,7 +183,7 @@ describe("the authHandler() middleware", function () {
 			ctx.url = "/test";
 			ctx.method = "GET";
 			ctx.request.header.date = date.toUTCString();
-			ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}"`;
+			ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}",headers="(request-target) date"`;
 
 			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
 			expect(ctx.throw.calledOnceWith(401)).to.be.true;
@@ -195,8 +191,6 @@ describe("the authHandler() middleware", function () {
 			expect(next.called).to.be.false;
 		});
 		it("should not authorize requests from the future", async () => {
-			const keyPair = generateTestKeys();
-
 			const user = await createTestUser();
 			const device = await createTestDevice(user._id, keyPair);
 
@@ -209,7 +203,7 @@ describe("the authHandler() middleware", function () {
 			ctx.url = "/test";
 			ctx.method = "GET";
 			ctx.request.header.date = date.toUTCString();
-			ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}"`;
+			ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}",headers="(request-target) date"`;
 
 			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
 			expect(ctx.throw.calledOnceWith(401)).to.be.true;
@@ -218,8 +212,6 @@ describe("the authHandler() middleware", function () {
 		});
 
 		it("should not authorize requests older than 1 second", async () => {
-			const keyPair = generateTestKeys();
-
 			const user = await createTestUser();
 			const device = await createTestDevice(user._id, keyPair);
 
@@ -232,7 +224,7 @@ describe("the authHandler() middleware", function () {
 			ctx.url = "/test";
 			ctx.method = "GET";
 			ctx.request.header.date = date.toUTCString();
-			ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}"`;
+			ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}",headers="(request-target) date"`;
 
 			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
 			expect(ctx.throw.calledOnceWith(401)).to.be.true;
@@ -240,9 +232,28 @@ describe("the authHandler() middleware", function () {
 			expect(next.called).to.be.false;
 		});
 
-		it("should authorize requests with correct signatures", async () => {
-			const keyPair = generateTestKeys();
+		it("should not authorize requests that don't specify the headers parameter", async () => {
+			const user = await createTestUser();
+			const device = await createTestDevice(user._id, keyPair);
 
+			const date = new Date();
+			const signatureStr = `date: ${new Date().toUTCString()}\n`;
+			const signature = crypto
+				.sign(null, Buffer.from(signatureStr), keyPair.privateKey)
+				.toString("base64");
+
+			ctx.url = "/test";
+			ctx.method = "GET";
+			ctx.request.header.date = date.toUTCString();
+			ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}"`;
+
+			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
+			expect(ctx.throw.calledOnceWith(400)).to.be.true;
+			expect(ctx.state.user).to.be.undefined;
+			expect(next.called).to.be.false;
+		});
+
+		it("should authorize requests with correct signatures", async () => {
 			const user = await createTestUser();
 			const device = await createTestDevice(user._id, keyPair);
 
@@ -255,7 +266,7 @@ describe("the authHandler() middleware", function () {
 			ctx.url = "/test";
 			ctx.method = "GET";
 			ctx.request.header.date = date.toUTCString();
-			ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}"`;
+			ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}",headers="(request-target) date"`;
 
 			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
 			expect(ctx.throw.called).to.be.false;
@@ -268,8 +279,6 @@ describe("the authHandler() middleware", function () {
 		});
 
 		it("should allow specification of custom signed headers", async () => {
-			const keyPair = generateTestKeys();
-
 			const user = await createTestUser();
 			const device = await createTestDevice(user._id, keyPair);
 
@@ -296,8 +305,6 @@ describe("the authHandler() middleware", function () {
 		});
 
 		it("Should require the request target to be included in the signature string", async () => {
-			const keyPair = generateTestKeys();
-
 			const user = await createTestUser();
 			const device = await createTestDevice(user._id, keyPair);
 
