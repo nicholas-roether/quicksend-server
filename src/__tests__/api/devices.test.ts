@@ -350,3 +350,68 @@ describe("POST /devices/remove", function () {
 		});
 	});
 });
+
+describe("GET /devices/list", () => {
+	createMongooseConnection();
+	let request: supertest.SuperTest<supertest.Test>;
+
+	before(() => {
+		request = supertest(createTestServer());
+	});
+
+	it("should not accept unauthorized requests", async () => {
+		const res = await request.get("/devices/list").expect(401);
+		expect(res).to.not.have.property("data");
+	});
+
+	context("with Signature authorization", async () => {
+		let testUser: User;
+		let testDevice: Device;
+		const testKeypair = generateTestKeys();
+		const genSignature = createTestSignatureGenerator("get /devices/list");
+
+		beforeEach(async () => {
+			const testUserDoc = new UserModel({
+				username: "test-test-test",
+				passwordHash: "seregfzdtfdghjtzfdkgh"
+			});
+			await testUserDoc.save();
+			testUser = testUserDoc;
+
+			const testDeviceDoc = new DeviceModel({
+				name: "Test Device",
+				user: testUser._id,
+				type: 1,
+				signaturePublicKey: testKeypair.publicKey,
+				encryptionPublicKey: "ergfdjhgfgkj"
+			});
+			await testDeviceDoc.save();
+			testDevice = testDeviceDoc;
+		});
+
+		it("should return the current device if it is the only one", async () => {
+			const date = new Date();
+			const res = await request
+				.get("/devices/list")
+				.set("Date", date.toUTCString())
+				.set(
+					"Authorization",
+					genSignature(testKeypair.privateKey, date, testDevice)
+				)
+				.expect(200);
+
+			expect(res.body).to.deep.equal({
+				data: [
+					{
+						id: testDevice._id.toHexString(),
+						name: testDevice.name,
+						type: testDevice.type,
+						lastActivity: testDevice.lastActivity.toISOString(),
+						createdAt: testDevice.createdAt.toISOString(),
+						updatedAt: testDevice.updatedAt.toISOString()
+					}
+				]
+			});
+		});
+	});
+});
