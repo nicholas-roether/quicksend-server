@@ -57,7 +57,7 @@ async function authenticateSignature(
 	ctx: Koa.Context,
 	req: SignatureAuthorizationRequest
 ) {
-	const headers = req.headers ?? signatureRequiredHeaders;
+	const headers = req.headers ?? ["date"];
 	if (!includesAll(headers, ...signatureRequiredHeaders))
 		return ctx.throw(400, "missing reqired header for signature");
 	let deviceId: mongoose.Types.ObjectId;
