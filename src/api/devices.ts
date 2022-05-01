@@ -81,15 +81,16 @@ devices.get("/list", authHandler(), async (ctx, next) => {
 	const userData = ctx.state.user as UserData;
 
 	const devices = await DeviceModel.find({ user: userData.id })
-		.select("name type lastActivity createdAt")
+		.select("name type lastActivity createdAt updatedAt")
 		.exec();
 
 	ctx.body = devices.map((device) => ({
 		id: device._id.toHexString(),
 		name: device.name,
 		type: device.type,
-		lastActivity: device.lastActivity,
-		createdAt: device.createdAt
+		lastActivity: device.lastActivity.toISOString(),
+		createdAt: device.createdAt.toISOString(),
+		updatedAt: device.updatedAt.toISOString()
 	}));
 	return next();
 });
