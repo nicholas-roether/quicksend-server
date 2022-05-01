@@ -380,5 +380,63 @@ describe("GET /devices/list", () => {
 				]
 			});
 		});
+
+		it("should return multiple devices if they exist", async () => {
+			const testDevice2 = new DeviceModel({
+				name: "Test Device #2",
+				user: testUser._id,
+				signaturePublicKey: "dsfghdztjjkfg",
+				encryptionPublicKey: "sfgdhdfjgjkhfg"
+			});
+			await testDevice2.save();
+
+			const res = await sign(request.get("/devices/list")).expect(200);
+
+			expect(res.body).to.deep.equal({
+				data: [
+					{
+						id: testDevice._id.toHexString(),
+						name: testDevice.name,
+						type: testDevice.type,
+						lastActivity: testDevice.lastActivity.toISOString(),
+						createdAt: testDevice.createdAt.toISOString(),
+						updatedAt: testDevice.updatedAt.toISOString()
+					},
+					{
+						id: testDevice2._id.toHexString(),
+						name: testDevice2.name,
+						type: testDevice2.type,
+						lastActivity: testDevice2.lastActivity.toISOString(),
+						createdAt: testDevice2.createdAt.toISOString(),
+						updatedAt: testDevice2.updatedAt.toISOString()
+					}
+				]
+			});
+		});
+
+		it("should only return devices belonging to the authorized user", async () => {
+			const unownedDevice = new DeviceModel({
+				name: "Test Device #2",
+				user: new mongoose.Types.ObjectId(),
+				signaturePublicKey: "dsfghdztjjkfg",
+				encryptionPublicKey: "sfgdhdfjgjkhfg"
+			});
+			await unownedDevice.save();
+
+			const res = await sign(request.get("/devices/list")).expect(200);
+
+			expect(res.body).to.deep.equal({
+				data: [
+					{
+						id: testDevice._id.toHexString(),
+						name: testDevice.name,
+						type: testDevice.type,
+						lastActivity: testDevice.lastActivity.toISOString(),
+						createdAt: testDevice.createdAt.toISOString(),
+						updatedAt: testDevice.updatedAt.toISOString()
+					}
+				]
+			});
+		});
 	});
 });
