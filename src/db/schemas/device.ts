@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
 import UserModel from "src/db/models/user";
+import { TimestampedDBObject } from "./base";
 
-interface Device {
-	_id: mongoose.Types.ObjectId;
+interface Device extends TimestampedDBObject {
 	name: string;
 	/**
 	 * ### Type meanings
@@ -18,8 +18,6 @@ interface Device {
 	lastActivity: Date;
 	signaturePublicKey: string;
 	encryptionPublicKey: string;
-	createdAt: Date;
-	updatedAt: Date;
 }
 
 const DeviceSchema = new mongoose.Schema<Device>(

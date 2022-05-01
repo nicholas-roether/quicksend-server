@@ -1,12 +1,10 @@
 import mongoose from "mongoose";
+import { TimestampedDBObject } from "./base";
 
-interface User {
-	_id: mongoose.Types.ObjectId;
+interface User extends TimestampedDBObject {
 	username: string;
 	display?: string;
 	passwordHash: string;
-	createdAt: Date;
-	updatedAt: Date;
 }
 
 const UserSchema = new mongoose.Schema<User>(
