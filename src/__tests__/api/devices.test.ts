@@ -9,7 +9,7 @@ import supertest from "supertest";
 import { createMongooseConnection } from "../__utils__/mongoose";
 import { generateTestKeys } from "../__utils__/rsa";
 import { createTestServer } from "../__utils__/server";
-import { createTestSignatureGenerator } from "../__utils__/signature";
+import { createSigner, Signer } from "../__utils__/signature";
 
 describe("POST /devices/add", () => {
 	createMongooseConnection();
@@ -233,11 +233,11 @@ describe("POST /devices/remove", function () {
 	});
 
 	context("with Signature authorization", () => {
-		const genSignature = createTestSignatureGenerator("post /devices/remove");
-
 		const deviceKeyPair = generateTestKeys();
 		let user: User;
 		let device: Device;
+
+		let sign: Signer;
 
 		beforeEach(async () => {
 			const userDoc = new UserModel({
@@ -254,19 +254,16 @@ describe("POST /devices/remove", function () {
 			await deviceDoc.save();
 			user = userDoc;
 			device = deviceDoc;
+
+			sign = createSigner(
+				"post /devices/remove",
+				device,
+				deviceKeyPair.privateKey
+			);
 		});
 
 		it("should respond with 400 to requests that don't provide an id", async () => {
-			const date = new Date();
-			await request
-				.post("/devices/remove")
-				.set("Date", date.toUTCString())
-				.set(
-					"Authorization",
-					genSignature(deviceKeyPair.privateKey, date, device)
-				)
-				.send({})
-				.expect(400);
+			await sign(request.post("/devices/remove")).send({}).expect(400);
 		});
 
 		it("should be able to remove devices belonging to the authorized user", async () => {
@@ -278,14 +275,7 @@ describe("POST /devices/remove", function () {
 			});
 			await device2.save();
 
-			const date = new Date();
-			await request
-				.post("/devices/remove")
-				.set("Date", date.toUTCString())
-				.set(
-					"Authorization",
-					genSignature(deviceKeyPair.privateKey, date, device)
-				)
+			await sign(request.post("/devices/remove"))
 				.send({ id: device2._id })
 				.expect(200);
 
@@ -295,14 +285,7 @@ describe("POST /devices/remove", function () {
 		});
 
 		it("should be able to remove the current device itself", async () => {
-			const date = new Date();
-			await request
-				.post("/devices/remove")
-				.set("Date", date.toUTCString())
-				.set(
-					"Authorization",
-					genSignature(deviceKeyPair.privateKey, date, device)
-				)
+			await sign(request.post("/devices/remove"))
 				.send({ id: device._id })
 				.expect(200);
 
@@ -311,14 +294,7 @@ describe("POST /devices/remove", function () {
 		});
 
 		it("should respond with 400 for non-existent device ids", async () => {
-			const date = new Date();
-			await request
-				.post("/devices/remove")
-				.set("Date", date.toUTCString())
-				.set(
-					"Authorization",
-					genSignature(deviceKeyPair.privateKey, date, device)
-				)
+			await sign(request.post("/devices/remove"))
 				.send({ id: new mongoose.Types.ObjectId() })
 				.expect(400);
 		});
@@ -332,14 +308,7 @@ describe("POST /devices/remove", function () {
 			});
 			await unownedDevice.save();
 
-			const date = new Date();
-			await request
-				.post("/devices/remove")
-				.set("Date", date.toUTCString())
-				.set(
-					"Authorization",
-					genSignature(deviceKeyPair.privateKey, date, device)
-				)
+			await sign(request.post("/devices/remove"))
 				.send({ id: unownedDevice._id })
 				.expect(400);
 
@@ -368,7 +337,7 @@ describe("GET /devices/list", () => {
 		let testUser: User;
 		let testDevice: Device;
 		const testKeypair = generateTestKeys();
-		const genSignature = createTestSignatureGenerator("get /devices/list");
+		let sign: Signer;
 
 		beforeEach(async () => {
 			const testUserDoc = new UserModel({
@@ -387,18 +356,16 @@ describe("GET /devices/list", () => {
 			});
 			await testDeviceDoc.save();
 			testDevice = testDeviceDoc;
+
+			sign = createSigner(
+				"get /devices/list",
+				testDevice,
+				testKeypair.privateKey
+			);
 		});
 
 		it("should return the current device if it is the only one", async () => {
-			const date = new Date();
-			const res = await request
-				.get("/devices/list")
-				.set("Date", date.toUTCString())
-				.set(
-					"Authorization",
-					genSignature(testKeypair.privateKey, date, testDevice)
-				)
-				.expect(200);
+			const res = await sign(request.get("/devices/list")).expect(200);
 
 			expect(res.body).to.deep.equal({
 				data: [
