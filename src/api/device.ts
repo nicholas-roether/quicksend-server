@@ -64,9 +64,13 @@ device.post(
 		const body = ctx.request.body as RemoveDeviceRequest;
 		const userData = ctx.state.user as UserData;
 
-		const device = await DeviceModel.findById(body.id).select("user").exec();
-		if (!device) return ctx.throw(404, "Device not found");
-		if (!device.user.equals(userData.id)) return ctx.throw(401, "Unauthorized");
+		const device = await DeviceModel.findOne({
+			_id: body.id,
+			user: userData.id
+		})
+			.select("user")
+			.exec();
+		if (!device) return ctx.throw(400, "Device does not exist");
 
 		await device.remove();
 		return next();
