@@ -19,7 +19,7 @@
 			"cwd": "${workspaceFolder}",
 			"runtimeExecutable": "yarn",
 			"args": [
-				"test",
+				"test:debug",
 				"--runInBand",
 			]
 		}

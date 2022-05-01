@@ -12,7 +12,8 @@
 		"dev": "ts-node-dev ./src/server.ts --inspect=4321 --respawn --transpile-only",
 		"lint": "eslint '.'",
 		"test": "ts-mocha -p ./tsconfig.json",
-		"test:watch": "ts-mocha --watch -p ./tsconfig.json"
+		"test:watch": "ts-mocha --watch -p ./tsconfig.json",
+		"test:debug": "ts-mocha -p ./tsconfig.json --inspect=4322"
 	},
 	"devDependencies": {
 		"@types/bcryptjs": "^2.4.2",
