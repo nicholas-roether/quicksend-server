@@ -3,6 +3,7 @@ import Joi from "joi";
 import bcrypt from "bcryptjs";
 import bodyValidator from "src/body_validator";
 import UserModel from "src/db/models/user";
+import authHandler, { UserData } from "src/authorization/handler";
 
 const user = new Router({ prefix: "/user" });
 
@@ -37,6 +38,18 @@ user.post("/create", bodyValidator(createUserSchema), async (ctx, next) => {
 	await user.save();
 	ctx.status = 201;
 	ctx.body = { id: user._id.toHexString() };
+	return next();
+});
+
+user.get("/info", authHandler("Signature"), async (ctx, next) => {
+	const userData = ctx.state.user as UserData;
+
+	ctx.body = {
+		id: userData.id.toHexString(),
+		username: userData.username,
+		display: userData.display
+	};
+
 	return next();
 });
 

@@ -4,6 +4,10 @@ import supertest from "supertest";
 import bcrypt from "bcryptjs";
 import { createMongooseConnection } from "../__utils__/mongoose";
 import { createTestServer } from "../__utils__/server";
+import { User } from "src/db/schemas/user";
+import { createSigner, Signer } from "../__utils__/signature";
+import { generateTestKeys } from "../__utils__/rsa";
+import DeviceModel from "src/db/models/device";
 
 describe("POST /user/create", function () {
 	createMongooseConnection();
@@ -83,6 +87,59 @@ describe("POST /user/create", function () {
 			expect(response.body).to.have.property("error");
 			const users = await UserModel.find().exec();
 			expect(users.length).to.equal(1);
+		});
+	});
+});
+
+describe("GET /user/info", () => {
+	createMongooseConnection();
+	let request: supertest.SuperTest<supertest.Test>;
+	let testUser: User;
+
+	before(() => {
+		request = supertest(createTestServer());
+	});
+
+	beforeEach(async () => {
+		const user = new UserModel({
+			username: "some_test_user",
+			display: "Some Test User",
+			passwordHash: "dfsgfjdghjhgf"
+		});
+		await user.save();
+		testUser = user;
+	});
+
+	it("should respond with 401 to unauthorized requests", async () => {
+		const response = await request.get("/user/info").expect(401);
+		expect(response).to.not.have.property("data");
+	});
+
+	context("with Signature authorization", () => {
+		const testKeypair = generateTestKeys();
+		let sign: Signer;
+
+		beforeEach(async () => {
+			const testDevice = new DeviceModel({
+				name: "Test Device",
+				user: testUser._id,
+				signaturePublicKey: testKeypair.publicKey,
+				encryptionPublicKey: "dfsghhfgjhkgjkhlhjlkö"
+			});
+			await testDevice.save();
+
+			sign = createSigner("get /user/info", testDevice, testKeypair.privateKey);
+		});
+
+		it("should return the correct user data", async () => {
+			const response = await sign(request.get("/user/info")).expect(200);
+			expect(response.body).to.deep.equal({
+				data: {
+					id: testUser._id.toHexString(),
+					username: testUser.username,
+					display: testUser.display
+				}
+			});
 		});
 	});
 });
