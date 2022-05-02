@@ -9,10 +9,11 @@ of this repository, as well as as of yet unimplemented concepts.
 Currently, the following API routes are implemented:
 - `/user`
   - `/create`: Creating new users
+  - `/info`:   Get information about the authenticated user
 - `/devices`
-  - `/add`: Add a new device for the authenticated user
+  - `/add`:    Add a new device for the authenticated user
   - `/remove`: Remove a device for the authenticated user
-  - `/list`: List all devices registered for the authenticated user
+  - `/list`:   List all devices registered for the authenticated user
 
 ### Authentication
 
