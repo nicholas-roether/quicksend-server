@@ -45,3 +45,9 @@ under consideration:
   - valid values: `"utf-8"` (default), `"base64"`
 - `Compression`:  the compression applided to the body after encoding
   - valid values: `"none"` (default), `"gzip"`
+
+### Socket Server
+
+Apart from the REST server, the quicksend-server process should start a seperate WebSocket server
+process that keeps track of connected devices, and sends WebSocket messages to them by reading the
+database.
