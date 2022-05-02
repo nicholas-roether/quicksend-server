@@ -32,11 +32,32 @@ function requireEnvVar(name: string): string {
 	return value;
 }
 
+interface ArrayDiff<T> {
+	missing: T[];
+	extra: T[];
+}
+
+function arrayDiff<T>(array: T[], reference: T[]): ArrayDiff<T> {
+	const set = new Set(array);
+	const refSet = new Set(reference);
+
+	for (const item of set) refSet.delete(item);
+	for (const item of refSet) set.delete(item);
+
+	return {
+		missing: Array.from(refSet),
+		extra: Array.from(set)
+	};
+}
+
 export {
 	collapseWhitespace,
 	splitAtIndex,
 	encodeBase64,
 	decodeBase64,
 	includesAll,
-	requireEnvVar
+	requireEnvVar,
+	arrayDiff
 };
+
+export type { ArrayDiff };
