@@ -1,26 +1,29 @@
 import mongoose from "mongoose";
 import DeviceModel from "src/db/models/device";
+import UserModel from "../models/user";
 import { TimestampedDBObject } from "./base";
 
 interface Message extends TimestampedDBObject {
-	from: mongoose.Types.ObjectId;
-	to: mongoose.Types.ObjectId;
+	fromUser: mongoose.Types.ObjectId;
+	toDevice: mongoose.Types.ObjectId;
 	sentAt: Date;
-	readOnDevices: mongoose.Types.ObjectId[];
 	headers: mongoose.Types.Map<string>;
 	body: string;
 }
 
 const MessageSchema = new mongoose.Schema<Message>(
 	{
-		from: { type: mongoose.SchemaTypes.ObjectId, required: true },
-		to: { type: mongoose.SchemaTypes.ObjectId, required: true },
-		sentAt: { type: Date, required: true },
-		readOnDevices: {
+		fromUser: {
 			type: mongoose.SchemaTypes.ObjectId,
-			default: [],
+			required: true,
+			ref: UserModel
+		},
+		toDevice: {
+			type: mongoose.SchemaTypes.ObjectId,
+			required: true,
 			ref: DeviceModel
 		},
+		sentAt: { type: Date, required: true },
 		headers: {
 			type: mongoose.SchemaTypes.Map,
 			of: String,
