@@ -41,7 +41,7 @@ function arrayDiff<T>(array: T[], reference: T[]): ArrayDiff<T> {
 	const set = new Set(array);
 	const refSet = new Set(reference);
 
-	for (const item of set) refSet.delete(item);
+	for (const item of set) if (refSet.delete(item)) set.delete(item);
 	for (const item of refSet) set.delete(item);
 
 	return {
