@@ -326,8 +326,6 @@ describe("the authHandler() middleware", function () {
 		});
 
 		it("Should require the date header to be included in the signature string", async () => {
-			const keyPair = generateTestKeys();
-
 			const user = await createTestUser();
 			const device = await createTestDevice(user._id, keyPair);
 
