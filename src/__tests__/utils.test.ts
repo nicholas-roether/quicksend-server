@@ -1,9 +1,11 @@
 import { expect } from "chai";
 import {
+	arrayDiff,
 	collapseWhitespace,
 	decodeBase64,
 	encodeBase64,
 	includesAll,
+	requireEnvVar,
 	splitAtIndex
 } from "src/utils";
 
@@ -67,5 +69,47 @@ describe("includesAll()", () => {
 	});
 	it("should recognize unincluded items", () => {
 		expect(includesAll([1, 2, 3, 4], 5, 1)).to.equal(false);
+	});
+});
+
+describe("requireEnvVar()", () => {
+	it("should throw an error if the requested environemnt variable is not set", () => {
+		delete process.env.TEST_ENV_VAR;
+		expect(() => requireEnvVar("TEST_ENV_VAR")).to.throw();
+	});
+
+	it("should return the value if the environment variable is set", () => {
+		process.env.TEST_ENV_VAR = "some_value";
+		expect(requireEnvVar("TEST_ENV_VAR")).to.equal("some_value");
+	});
+});
+
+describe("arrayDiff()", () => {
+	it("should return no differences for identical arrays", () => {
+		expect(arrayDiff([1, 2, 3], [1, 2, 3])).to.deep.equal({
+			missing: [],
+			extra: []
+		});
+	});
+
+	it("should recognize missing items", () => {
+		expect(arrayDiff([1, 3], [1, 2, 3, 4, 5])).to.deep.equal({
+			missing: [2, 4, 5],
+			extra: []
+		});
+	});
+
+	it("should recognize extraneous items", () => {
+		expect(arrayDiff([1, 2, 3, 4, 5], [1, 3, 4])).to.deep.equal({
+			missing: [],
+			extra: [2, 5]
+		});
+	});
+
+	it("should recognize both missing and extraneous items simultaneously", () => {
+		expect(arrayDiff([1, 4, 5, 7, 9], [1, 2, 3, 4, 5, 6])).to.deep.equal({
+			missing: [2, 3, 6],
+			extra: [7, 9]
+		});
 	});
 });
