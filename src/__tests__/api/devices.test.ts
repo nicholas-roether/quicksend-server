@@ -266,6 +266,12 @@ describe("POST /devices/remove", function () {
 			await sign(request.post("/devices/remove")).send({}).expect(400);
 		});
 
+		it("should respond with 400 to requests whose id is invalid", async () => {
+			await sign(request.post("/devices/remove"))
+				.send({ id: "gsdfhrdgfztu" })
+				.expect(400);
+		});
+
 		it("should be able to remove devices belonging to the authorized user", async () => {
 			const device2 = new DeviceModel({
 				name: "test_device_2",
