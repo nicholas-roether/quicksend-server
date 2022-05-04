@@ -1,5 +1,5 @@
 import "src/config";
-import authHandler from "src/authorization/handler";
+import authHandler from "src/auth/handler";
 import mongoose from "mongoose";
 import crypto from "crypto";
 import { encodeBase64 } from "src/utils";

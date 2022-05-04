@@ -1,5 +1,5 @@
 import { expect, assert } from "chai";
-import parseAuthorization from "src/authorization/parse";
+import parseAuthorization from "src/auth/parse";
 import { encodeBase64 } from "src/utils";
 
 describe("parseAuthorization()", () => {

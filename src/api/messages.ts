@@ -1,6 +1,6 @@
 import Router from "@koa/router";
 import Joi from "joi";
-import authHandler, { UserData } from "src/authorization/handler";
+import authHandler, { UserData } from "src/auth/handler";
 import bodyValidator from "src/body_validator";
 import deviceManager from "src/control/device_manager";
 import messageManager from "src/control/message_manager";
