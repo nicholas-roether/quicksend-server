@@ -2,7 +2,8 @@ import Router from "@koa/router";
 import Joi from "joi";
 import authHandler, { UserData } from "src/authorization/handler";
 import bodyValidator from "src/body_validator";
-import DeviceModel from "src/db/models/device";
+import deviceManager from "src/control/device_manager";
+import { isValidID } from "src/control/utils";
 
 const devices = new Router({ prefix: "/devices" });
 
@@ -32,18 +33,17 @@ devices.post(
 
 		const userData = ctx.state.user as UserData;
 
-		if (await DeviceModel.exists({ name: body.name, user: userData.id }).exec())
+		if (await deviceManager.nameExistsForUser(body.name, userData.id))
 			return ctx.throw(400, "Device with this name already exists");
-		const device = new DeviceModel({
+		const deviceCtr = await deviceManager.create({
 			name: body.name,
 			type: body.type,
 			user: userData.id,
 			signaturePublicKey: body.signaturePublicKey,
 			encryptionPublicKey: body.encryptionPublicKey
 		});
-		await device.save();
 		ctx.status = 201;
-		ctx.body = { id: device._id };
+		ctx.body = { id: deviceCtr.id };
 		return next();
 	}
 );
@@ -64,15 +64,11 @@ devices.post(
 		const body = ctx.request.body as RemoveDeviceRequest;
 		const userData = ctx.state.user as UserData;
 
-		const device = await DeviceModel.findOne({
-			_id: body.id,
-			user: userData.id
-		})
-			.select("user")
-			.exec();
-		if (!device) return ctx.throw(400, "Device does not exist");
+		if (!isValidID(body.id)) return ctx.throw(400, "Not a valid device id");
+		if (!(await deviceManager.idExistsForUser(body.id, userData.id)))
+			return ctx.throw(400, "Device does not exist");
+		await deviceManager.remove(body.id);
 
-		await device.remove();
 		return next();
 	}
 );
@@ -80,17 +76,15 @@ devices.post(
 devices.get("/list", authHandler(), async (ctx, next) => {
 	const userData = ctx.state.user as UserData;
 
-	const devices = await DeviceModel.find({ user: userData.id })
-		.select("name type lastActivity createdAt updatedAt")
-		.exec();
+	const deviceCtrs = await deviceManager.list(userData.id);
 
-	ctx.body = devices.map((device) => ({
-		id: device._id.toHexString(),
-		name: device.name,
-		type: device.type,
-		lastActivity: device.lastActivity.toISOString(),
-		createdAt: device.createdAt.toISOString(),
-		updatedAt: device.updatedAt.toISOString()
+	ctx.body = deviceCtrs.map((deviceCtr) => ({
+		id: deviceCtr.id.toHexString(),
+		name: deviceCtr.get("name"),
+		type: deviceCtr.get("type"),
+		lastActivity: deviceCtr.get("lastActivity").toISOString(),
+		createdAt: deviceCtr.get("createdAt").toISOString(),
+		updatedAt: deviceCtr.get("updatedAt").toISOString()
 	}));
 	return next();
 });

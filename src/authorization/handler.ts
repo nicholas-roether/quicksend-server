@@ -7,10 +7,10 @@ import {
 	BasicAuthorizationRequest,
 	SignatureAuthorizationRequest
 } from "./schemes";
-import UserModel from "src/db/models/user";
 import { includesAll } from "src/utils";
-import DeviceModel from "src/db/models/device";
-import { User } from "src/db/schemas/user";
+import userManager from "src/control/user_manager";
+import deviceManager from "src/control/device_manager";
+import { isValidID } from "src/control/utils";
 
 interface UserData {
 	id: mongoose.Types.ObjectId;
@@ -23,14 +23,14 @@ async function authenticateBasic(
 	req: BasicAuthorizationRequest
 ) {
 	const { username, password } = req;
-	const user = await UserModel.findOne({ username }).exec();
+	const user = await userManager.findUsername(username);
 	if (!user) return ctx.throw(400, "User doesn't exist");
-	if (!bcrypt.compareSync(password, user.passwordHash))
+	if (!bcrypt.compareSync(password, user.get("passwordHash")))
 		return ctx.throw(401, "Invalid credentials");
 	ctx.state.user = {
-		id: user._id,
-		username: user.username,
-		display: user.display
+		id: user.id,
+		username: user.get("username"),
+		display: user.get("display")
 	} as UserData;
 }
 
@@ -60,31 +60,28 @@ async function authenticateSignature(
 	const headers = req.headers ?? ["date"];
 	if (!includesAll(headers, ...signatureRequiredHeaders))
 		return ctx.throw(400, "missing reqired header for signature");
-	let deviceId: mongoose.Types.ObjectId;
-	try {
-		deviceId = new mongoose.Types.ObjectId(req.keyId);
-	} catch (err) {
-		ctx.throw(400, "invalid device id");
-	}
-	const device = await DeviceModel.findById(deviceId)
-		.select("signaturePublicKey user")
-		.exec();
+	if (!isValidID(req.keyId)) ctx.throw(400, "invalid device id");
+	const device = await deviceManager.findID(
+		req.keyId,
+		"signaturePublicKey user"
+	);
 	if (!device) return ctx.throw(401, "Unregistered device");
+
 	const signatureStr = createSignatureString(ctx, headers);
 	const result = crypto.verify(
 		req.algorithm,
 		Buffer.from(signatureStr),
-		device.signaturePublicKey,
+		device.get("signaturePublicKey"),
 		Buffer.from(req.signature, "base64")
 	);
 	if (!result) return ctx.throw(401, "Incorrect signature");
-	await device.populate("user");
-	const user = device.user as unknown as User;
-	if (!device) ctx.throw(500, "Unexpected error");
+
+	const user = await userManager.findID(device.get("user"));
+	if (!user) ctx.throw(500, "Could not find user for this device");
 	ctx.state.user = {
-		id: user._id,
-		username: user.username,
-		display: user.display
+		id: user.id,
+		username: user.get("username"),
+		display: user.get("display")
 	} as UserData;
 }
 

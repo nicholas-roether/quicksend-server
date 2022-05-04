@@ -1,11 +1,11 @@
 import Router from "@koa/router";
 import Joi from "joi";
-import mongoose from "mongoose";
 import authHandler, { UserData } from "src/authorization/handler";
 import bodyValidator from "src/body_validator";
-import DeviceModel from "src/db/models/device";
-import MessageModel from "src/db/models/message";
-import UserModel from "src/db/models/user";
+import deviceManager from "src/control/device_manager";
+import messageManager from "src/control/message_manager";
+import userManager from "src/control/user_manager";
+import { isValidID } from "src/control/utils";
 import { arrayDiff } from "src/utils";
 
 const messages = new Router({ prefix: "/messages" });
@@ -13,17 +13,15 @@ messages.use(authHandler("Signature"));
 
 messages.get("/targets/:userId", async (ctx, next) => {
 	const userId = ctx.params.userId;
-	if (!mongoose.Types.ObjectId.isValid(userId))
-		return ctx.throw(400, "Invalid user id");
+	if (!isValidID(userId)) return ctx.throw(400, "Invalid user id");
 
-	if (!(await UserModel.exists({ _id: userId })))
+	if (!(await userManager.idExists(userId)))
 		return ctx.throw(400, "User does not exist");
+	const deviceCtrs = await deviceManager.listEncryptionKeys(userId);
 
-	const devices = await DeviceModel.find({ user: userId })
-		.select("encryptionPublicKey")
-		.exec();
-
-	const ids: string[] = devices.map((device) => device.encryptionPublicKey);
+	const ids: string[] = deviceCtrs.map((deviceCtr) =>
+		deviceCtr.get("encryptionPublicKey")
+	);
 	ctx.body = ids;
 
 	return next();
@@ -48,9 +46,8 @@ const MESSAGE_AGE_LIMIT = 300000; // 5 minutes
 messages.post("/send", bodyValidator(sendMessageSchema), async (ctx, next) => {
 	const userData = ctx.state.user as UserData;
 	const { to, sentAt, headers, bodies } = ctx.body as SendMessageRequest;
-	if (!mongoose.Types.ObjectId.isValid(to))
-		return ctx.throw(400, "Invalid recipient user id");
-	if (!(await UserModel.exists({ _id: to })))
+	if (!isValidID(to)) return ctx.throw(400, "Invalid recipient user id");
+	if (!(await userManager.idExists(to)))
 		return ctx.throw(400, "User does not exist");
 
 	const sentAtDate = new Date(sentAt);
@@ -59,10 +56,8 @@ messages.post("/send", bodyValidator(sendMessageSchema), async (ctx, next) => {
 		return ctx.throw(400, "Cannot send messages from the future");
 	if (messageAge > MESSAGE_AGE_LIMIT) return ctx.throw(400, "Message too old");
 
-	const targetDevices = await DeviceModel.find({ user: to })
-		.select("_id")
-		.exec();
-	const targetIds = targetDevices.map((device) => device._id.toHexString());
+	const targetDevices = await deviceManager.listIDs(to);
+	const targetIds = targetDevices.map((device) => device.id.toHexString());
 
 	const idDiff = arrayDiff(Object.keys(bodies), targetIds);
 	if (idDiff.missing.length > 0)
@@ -70,16 +65,15 @@ messages.post("/send", bodyValidator(sendMessageSchema), async (ctx, next) => {
 	if (idDiff.extra.length > 0)
 		return ctx.throw(400, "Extraneous unknown device(s)");
 
-	const messages = Object.entries(bodies).map(([deviceId, body]) => {
-		return new MessageModel({
+	await messageManager.createMany(
+		Object.entries(bodies).map(([deviceId, body]) => ({
 			fromUser: userData.id,
 			toDevice: deviceId,
 			sentAt: new Date(sentAt),
 			headers,
 			body
-		});
-	});
-	await Promise.all(messages.map((message) => message.save()));
+		}))
+	);
 
 	return next();
 });
