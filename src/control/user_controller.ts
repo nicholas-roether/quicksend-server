@@ -3,8 +3,8 @@ import Controller from "./controller";
 import { Doc } from "./types";
 
 class UserController extends Controller<User> {
-	constructor(document: Doc<User>) {
-		super(document);
+	constructor(document: Doc<User>, proj?: string) {
+		super(document, proj);
 	}
 }
 

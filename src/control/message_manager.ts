@@ -9,8 +9,11 @@ class MessageManager extends Manager<Message, MessageController> {
 		super(MessageModel);
 	}
 
-	protected createController(document: Doc<Message>): MessageController {
-		return new MessageController(document);
+	protected createController(
+		document: Doc<Message>,
+		proj?: string
+	): MessageController {
+		return new MessageController(document, proj);
 	}
 }
 const messageManager = new MessageManager();

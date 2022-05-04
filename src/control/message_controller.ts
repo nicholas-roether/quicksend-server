@@ -3,8 +3,8 @@ import Controller from "./controller";
 import { Doc } from "./types";
 
 class MessageController extends Controller<Message> {
-	constructor(document: Doc<Message>) {
-		super(document);
+	constructor(document: Doc<Message>, proj?: string) {
+		super(document, proj);
 	}
 }
 

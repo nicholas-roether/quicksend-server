@@ -16,7 +16,7 @@ abstract class Manager<D extends DBObject, C extends Controller<D>> {
 	): Promise<C | null> {
 		const doc = await this.Model.findById(id, proj).exec();
 		if (!doc) return null;
-		return this.createController(doc);
+		return this.createController(doc, proj);
 	}
 
 	async create(data: DocInit<D>): Promise<C> {
@@ -39,10 +39,10 @@ abstract class Manager<D extends DBObject, C extends Controller<D>> {
 		return !!queryRes;
 	}
 
-	protected abstract createController(document: Doc<D>): C;
+	protected abstract createController(document: Doc<D>, proj?: string): C;
 
-	protected createControllers(documents: Doc<D>[]): C[] {
-		return documents.map((doc) => this.createController(doc));
+	protected createControllers(documents: Doc<D>[], proj?: string): C[] {
+		return documents.map((doc) => this.createController(doc, proj));
 	}
 }
 

@@ -20,26 +20,28 @@ class DeviceManager extends Manager<Device, DeviceController> {
 	}
 
 	async list(user: ID): Promise<DeviceController[]> {
-		const docs = await this.Model.find({ user })
-			.select("name type lastActivity createdAt updatedAt")
-			.exec();
-		return this.createControllers(docs);
+		const proj = "name type lastActivity createdAt updatedAt";
+		const docs = await this.Model.find({ user }).select(proj).exec();
+		return this.createControllers(docs, proj);
 	}
 
 	async listIDs(user: ID): Promise<DeviceController[]> {
 		const docs = await this.Model.find({ user }).select("").exec();
-		return this.createControllers(docs);
+		return this.createControllers(docs, "");
 	}
 
 	async listEncryptionKeys(user: ID): Promise<DeviceController[]> {
 		const docs = await this.Model.find({ user })
 			.select("encryptionPublicKey")
 			.exec();
-		return this.createControllers(docs);
+		return this.createControllers(docs, "encryptionPublicKey");
 	}
 
-	protected createController(document: Doc<Device>): DeviceController {
-		return new DeviceController(document);
+	protected createController(
+		document: Doc<Device>,
+		proj?: string
+	): DeviceController {
+		return new DeviceController(document, proj);
 	}
 }
 

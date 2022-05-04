@@ -3,8 +3,8 @@ import Controller from "./controller";
 import { Doc } from "./types";
 
 class DeviceController extends Controller<Device> {
-	constructor(document: Doc<Device>) {
-		super(document);
+	constructor(document: Doc<Device>, proj?: string) {
+		super(document, proj);
 	}
 }
 
