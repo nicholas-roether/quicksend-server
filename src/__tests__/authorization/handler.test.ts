@@ -124,6 +124,7 @@ describe("the authHandler() middleware", function () {
 			await catchMiddlewareErrors(authHandler(), ctx, next);
 			expect(ctx.throw.calledOnceWith(401)).to.be.true;
 			expect(ctx.state.user).to.be.undefined;
+			expect(ctx.state.device).to.be.undefined;
 			expect(ctx.response.header["www-authenticate"]).to.match(/^Signature/);
 			expect(next.called).to.be.false;
 		});
@@ -133,6 +134,7 @@ describe("the authHandler() middleware", function () {
 			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
 			expect(ctx.throw.calledOnceWith(400)).to.be.true;
 			expect(ctx.state.user).to.be.undefined;
+			expect(ctx.state.device).to.be.undefined;
 			expect(next.called).to.be.false;
 		});
 
@@ -142,6 +144,7 @@ describe("the authHandler() middleware", function () {
 			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
 			expect(ctx.throw.calledOnceWith(400)).to.be.true;
 			expect(ctx.state.user).to.be.undefined;
+			expect(ctx.state.device).to.be.undefined;
 			expect(next.called).to.be.false;
 		});
 
@@ -160,6 +163,7 @@ describe("the authHandler() middleware", function () {
 			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
 			expect(ctx.throw.calledOnceWith(401)).to.be.true;
 			expect(ctx.state.user).to.be.undefined;
+			expect(ctx.state.device).to.be.undefined;
 			expect(next.called).to.be.false;
 		});
 
@@ -167,6 +171,8 @@ describe("the authHandler() middleware", function () {
 			ctx.request.header.authorization = 'Signature keyId="fsdgfdg"';
 			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
 			expect(ctx.throw.calledOnceWith(400)).to.be.true;
+			expect(ctx.state.user).to.be.undefined;
+			expect(ctx.state.device).to.be.undefined;
 			expect(next.called).to.be.false;
 		});
 
@@ -188,6 +194,7 @@ describe("the authHandler() middleware", function () {
 			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
 			expect(ctx.throw.calledOnceWith(401)).to.be.true;
 			expect(ctx.state.user).to.be.undefined;
+			expect(ctx.state.device).to.be.undefined;
 			expect(next.called).to.be.false;
 		});
 		it("should not authorize requests from the future", async () => {
@@ -208,6 +215,7 @@ describe("the authHandler() middleware", function () {
 			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
 			expect(ctx.throw.calledOnceWith(401)).to.be.true;
 			expect(ctx.state.user).to.be.undefined;
+			expect(ctx.state.device).to.be.undefined;
 			expect(next.called).to.be.false;
 		});
 
@@ -229,6 +237,7 @@ describe("the authHandler() middleware", function () {
 			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
 			expect(ctx.throw.calledOnceWith(401)).to.be.true;
 			expect(ctx.state.user).to.be.undefined;
+			expect(ctx.state.device).to.be.undefined;
 			expect(next.called).to.be.false;
 		});
 
@@ -250,6 +259,7 @@ describe("the authHandler() middleware", function () {
 			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
 			expect(ctx.throw.calledOnceWith(400)).to.be.true;
 			expect(ctx.state.user).to.be.undefined;
+			expect(ctx.state.device).to.be.undefined;
 			expect(next.called).to.be.false;
 		});
 
@@ -275,6 +285,8 @@ describe("the authHandler() middleware", function () {
 				username: user.username,
 				display: user.display
 			});
+			expect(ctx.state.device).to.be.instanceOf(mongoose.Types.ObjectId);
+			expect(ctx.state.device.equals(device._id)).to.be.true;
 			expect(next.calledOnce).to.be.true;
 		});
 
@@ -301,6 +313,8 @@ describe("the authHandler() middleware", function () {
 				username: user.username,
 				display: user.display
 			});
+			expect(ctx.state.device).to.be.instanceOf(mongoose.Types.ObjectId);
+			expect(ctx.state.device.equals(device._id)).to.be.true;
 			expect(next.calledOnce).to.be.true;
 		});
 
@@ -322,6 +336,7 @@ describe("the authHandler() middleware", function () {
 			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
 			expect(ctx.throw.calledOnceWith(400)).to.be.true;
 			expect(ctx.state.user).to.be.undefined;
+			expect(ctx.state.device).to.be.undefined;
 			expect(next.called).to.be.false;
 		});
 
@@ -341,6 +356,7 @@ describe("the authHandler() middleware", function () {
 			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
 			expect(ctx.throw.calledOnceWith(400)).to.be.true;
 			expect(ctx.state.user).to.be.undefined;
+			expect(ctx.state.device).to.be.undefined;
 			expect(next.called).to.be.false;
 		});
 	});
