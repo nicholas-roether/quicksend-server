@@ -40,11 +40,12 @@ among other possible uses, tell the client how the body is to be interpreted. In
 to send data of any (possibly binary) format, the following headers are
 under consideration:
 
-- `Type`:         the MIME type of the body content (default: `"text/plain"`)
-- `Encoding`:     the encoding of the body content
+- `type`:         the MIME type of the body content (default: `"text/plain"`)
+- `encoding`:     the encoding of the body content
   - valid values: `"utf-8"` (default), `"base64"`
-- `Compression`:  the compression applided to the body after encoding
-  - valid values: `"none"` (default), `"gzip"`
+
+Large messages, such as those containing images, will also be compressed during transit.
+
 
 ### Socket Server
 
