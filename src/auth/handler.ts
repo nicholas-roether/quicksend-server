@@ -83,6 +83,7 @@ async function authenticateSignature(
 		username: user.get("username"),
 		display: user.get("display")
 	} as UserData;
+	ctx.state.device = device.id;
 }
 
 type AuthType = "Basic" | "Signature";
