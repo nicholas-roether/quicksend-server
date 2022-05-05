@@ -415,6 +415,7 @@ describe("POST /messages/send", async () => {
 			expect(messages.length).to.equal(1);
 			const message = messages[0];
 			expect(message.fromUser.equals(testUser._id)).to.be.true;
+			expect(message.toUser.equals(testUser._id)).to.be.true;
 			expect(message.toDevice.equals(testDevice2._id)).to.be.true;
 			expect(message.sentAt.getTime()).to.equal(date.getTime());
 			expect(message.headers.size).to.equal(0);
@@ -478,6 +479,7 @@ describe("POST /messages/send", async () => {
 			expect(messages.length).to.equal(1);
 			const message = messages[0];
 			expect(message.fromUser.equals(testUser._id)).to.be.true;
+			expect(message.toUser.equals(testUser._id)).to.be.true;
 			expect(message.toDevice.equals(testDevice2._id)).to.be.true;
 			expect(message.sentAt.getTime()).to.equal(date.getTime());
 			expect(message.headers.size).to.equal(1);
@@ -517,6 +519,7 @@ describe("POST /messages/send", async () => {
 			expect(messages.length).to.equal(1);
 			const message = messages[0];
 			expect(message.fromUser.equals(testUser._id)).to.be.true;
+			expect(message.toUser.equals(otherUser._id)).to.be.true;
 			expect(message.toDevice.equals(someDevice._id)).to.be.true;
 			expect(message.sentAt.getTime()).to.equal(date.getTime());
 			expect(message.headers.size).to.equal(1);
@@ -566,6 +569,7 @@ describe("POST /messages/send", async () => {
 			const [message1, message2] = messages;
 
 			expect(message1.fromUser.equals(testUser._id)).to.be.true;
+			expect(message1.toUser.equals(otherUser._id)).to.be.true;
 			expect(message1.toDevice.equals(testDevice2._id)).to.be.true;
 			expect(message1.sentAt.getTime()).to.equal(date.getTime());
 			expect(message1.headers.size).to.equal(1);
@@ -573,6 +577,7 @@ describe("POST /messages/send", async () => {
 			expect(message1.body).to.equal("Hello TestDevice");
 
 			expect(message2.fromUser.equals(testUser._id)).to.be.true;
+			expect(message2.toUser.equals(otherUser._id)).to.be.true;
 			expect(message2.toDevice.equals(someDevice._id)).to.be.true;
 			expect(message2.sentAt.getTime()).to.equal(date.getTime());
 			expect(message2.headers.size).to.equal(1);

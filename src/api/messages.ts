@@ -4,6 +4,7 @@ import authHandler, { UserData } from "src/auth/handler";
 import bodyValidator from "src/body_validator";
 import deviceManager from "src/control/device_manager";
 import messageManager from "src/control/message_manager";
+import { ID } from "src/control/types";
 import userManager from "src/control/user_manager";
 import { isValidID } from "src/control/utils";
 import { arrayDiff } from "src/utils";
@@ -77,6 +78,7 @@ messages.post("/send", bodyValidator(sendMessageSchema), async (ctx, next) => {
 	await messageManager.createMany(
 		Object.entries(bodies).map(([deviceId, body]) => ({
 			fromUser: userData.id,
+			toUser: to,
 			toDevice: deviceId,
 			sentAt: new Date(sentAt),
 			headers,
@@ -85,6 +87,19 @@ messages.post("/send", bodyValidator(sendMessageSchema), async (ctx, next) => {
 	);
 
 	ctx.status = 201;
+	return next();
+});
+
+messages.get("/poll", async (ctx, next) => {
+	const deviceId = ctx.state.device as ID;
+	const messageCtrs = await messageManager.poll(deviceId);
+	ctx.body = messageCtrs.map((messageCtr) => ({
+		fromUser: messageCtr.get("fromUser"),
+		sentAt: messageCtr.get("sentAt"),
+		headers: messageCtr.get("headers"),
+		body: messageCtr.get("body")
+	}));
+
 	return next();
 });
 
