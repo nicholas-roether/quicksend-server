@@ -2,12 +2,14 @@ import crypto from "crypto";
 import { Device } from "src/db/schemas/device";
 import supertest from "supertest";
 
-type Signer = (req: supertest.Test) => supertest.Test;
+type Signer = (req: supertest.Test, path?: string) => supertest.Test;
 
 function createSigner(target: string, device: Device, key: string): Signer {
-	return (req) => {
+	return (req, path = "") => {
 		const date = new Date();
-		const signatureStr = `(request-target): ${target}\ndate: ${date.toUTCString()}\n`;
+		const signatureStr = `(request-target): ${
+			target + path
+		}\ndate: ${date.toUTCString()}\n`;
 		const signature = crypto
 			.sign(null, Buffer.from(signatureStr), key)
 			.toString("base64");
