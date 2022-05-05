@@ -25,13 +25,14 @@ class DeviceManager extends Manager<Device, DeviceController> {
 		return this.createControllers(docs, proj);
 	}
 
-	async listIDs(user: ID): Promise<DeviceController[]> {
-		const docs = await this.Model.find({ user }).select("").exec();
-		return this.createControllers(docs, "");
-	}
-
-	async listEncryptionKeys(user: ID): Promise<DeviceController[]> {
-		const docs = await this.Model.find({ user })
+	async findMessageTargets(
+		targetUser: ID,
+		senderUser: ID,
+		senderDevice: ID
+	): Promise<DeviceController[]> {
+		const docs = await this.Model.find()
+			.or([{ user: targetUser }, { user: senderUser }])
+			.where({ _id: { $ne: senderDevice } })
 			.select("encryptionPublicKey")
 			.exec();
 		return this.createControllers(docs, "encryptionPublicKey");

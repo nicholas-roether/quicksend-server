@@ -17,7 +17,11 @@ messages.get("/targets/:userId", async (ctx, next) => {
 
 	if (!(await userManager.idExists(userId)))
 		return ctx.throw(400, "User does not exist");
-	const deviceCtrs = await deviceManager.listEncryptionKeys(userId);
+	const deviceCtrs = await deviceManager.findMessageTargets(
+		userId,
+		ctx.state.user.id,
+		ctx.state.device
+	);
 
 	const ids: string[] = deviceCtrs.map((deviceCtr) =>
 		deviceCtr.get("encryptionPublicKey")
@@ -37,7 +41,7 @@ interface SendMessageRequest {
 const sendMessageSchema = Joi.object<SendMessageRequest>({
 	to: Joi.string().required(),
 	sentAt: Joi.string().isoDate().required(),
-	headers: Joi.object().pattern(Joi.string(), Joi.string()).required(),
+	headers: Joi.object().pattern(Joi.string(), Joi.string()).optional(),
 	bodies: Joi.object().pattern(Joi.string(), Joi.string()).required()
 });
 
@@ -45,7 +49,8 @@ const MESSAGE_AGE_LIMIT = 300000; // 5 minutes
 
 messages.post("/send", bodyValidator(sendMessageSchema), async (ctx, next) => {
 	const userData = ctx.state.user as UserData;
-	const { to, sentAt, headers, bodies } = ctx.body as SendMessageRequest;
+	const { to, sentAt, headers, bodies } = ctx.request
+		.body as SendMessageRequest;
 	if (!isValidID(to)) return ctx.throw(400, "Invalid recipient user id");
 	if (!(await userManager.idExists(to)))
 		return ctx.throw(400, "User does not exist");
@@ -56,8 +61,12 @@ messages.post("/send", bodyValidator(sendMessageSchema), async (ctx, next) => {
 		return ctx.throw(400, "Cannot send messages from the future");
 	if (messageAge > MESSAGE_AGE_LIMIT) return ctx.throw(400, "Message too old");
 
-	const targetDevices = await deviceManager.listIDs(to);
-	const targetIds = targetDevices.map((device) => device.id.toHexString());
+	const targets = await deviceManager.findMessageTargets(
+		to,
+		userData.id,
+		ctx.state.device
+	);
+	const targetIds = targets.map((device) => device.id.toHexString());
 
 	const idDiff = arrayDiff(Object.keys(bodies), targetIds);
 	if (idDiff.missing.length > 0)
@@ -75,6 +84,7 @@ messages.post("/send", bodyValidator(sendMessageSchema), async (ctx, next) => {
 		}))
 	);
 
+	ctx.status = 201;
 	return next();
 });
 
