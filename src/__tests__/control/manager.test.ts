@@ -16,7 +16,7 @@ const TestObjSchema = new mongoose.Schema<TestObj>({
 	val2: { type: Number, required: true }
 });
 
-const TestObjModel = mongoose.model("test_obj", TestObjSchema);
+const TestObjModel = mongoose.model("test_obj_2", TestObjSchema);
 
 class TestObjManager extends Manager<TestObj, Controller<TestObj>> {
 	constructor() {
