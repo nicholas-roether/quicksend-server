@@ -24,7 +24,7 @@ class Controller<D extends DBObject> {
 	}
 
 	get modelName(): string {
-		return this._doc.modelName;
+		return this._doc.collection.name.replace(/s$/, "");
 	}
 
 	get id(): ObjectId {
@@ -36,7 +36,8 @@ class Controller<D extends DBObject> {
 	get(field: string) {
 		if (!this.isFieldDefined(field))
 			throw new ProjectionAccessError(this.modelName, field);
-		if (field in this._doc) return this._doc[field as keyof D];
+		if (field in this._doc.toObject() && field != "_id")
+			return this._doc[field as keyof D];
 		return undefined;
 	}
 
