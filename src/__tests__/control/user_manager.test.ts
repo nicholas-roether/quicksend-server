@@ -52,7 +52,7 @@ describe("The user manager", () => {
 
 			const users = await UserModel.find().exec();
 			expect(users.length).to.equal(1);
-			const user = users[1];
+			const user = users[0];
 			expect(user.username).to.equal("test_user");
 			expect(user.display).to.equal("Test User");
 			expect(bcrypt.compareSync("pwd123", user.passwordHash)).to.be.true;

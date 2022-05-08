@@ -10,7 +10,7 @@ describe("The message manager", () => {
 	describe("poll()", () => {
 		it("should return an empty array if no messages to the device exist", async () => {
 			const ctrs = await messageManager.poll(new mongoose.Types.ObjectId());
-			expect(ctrs.length).to.equal(1);
+			expect(ctrs.length).to.equal(0);
 		});
 
 		it("should return all messages associated with the device", async () => {
@@ -43,8 +43,6 @@ describe("The message manager", () => {
 
 			expect(ctr1.id.equals(message1._id)).to.be.true;
 			expect(ctr1.get("fromUser").equals(message1.fromUser)).to.be.true;
-			expect(ctr1.get("toUser").equals(message1.toUser)).to.be.true;
-			expect(ctr1.get("toDevice").equals(message1.toDevice)).to.be.true;
 			expect(ctr1.get("sentAt").getTime()).to.equal(message1.sentAt.getTime());
 			expect(ctr1.get("headers").get("type")).to.equal(
 				message1.headers.get("type")
@@ -53,8 +51,6 @@ describe("The message manager", () => {
 
 			expect(ctr2.id.equals(message2._id)).to.be.true;
 			expect(ctr2.get("fromUser").equals(message2.fromUser)).to.be.true;
-			expect(ctr2.get("toUser").equals(message2.toUser)).to.be.true;
-			expect(ctr2.get("toDevice").equals(message2.toDevice)).to.be.true;
 			expect(ctr2.get("sentAt").getTime()).to.equal(message2.sentAt.getTime());
 			expect(ctr2.get("headers").get("type")).to.equal(
 				message2.headers.get("type")
@@ -92,8 +88,6 @@ describe("The message manager", () => {
 
 			expect(ctr.id.equals(message1._id)).to.be.true;
 			expect(ctr.get("fromUser").equals(message1.fromUser)).to.be.true;
-			expect(ctr.get("toUser").equals(message1.toUser)).to.be.true;
-			expect(ctr.get("toDevice").equals(message1.toDevice)).to.be.true;
 			expect(ctr.get("sentAt").getTime()).to.equal(message1.sentAt.getTime());
 			expect(ctr.get("headers").get("type")).to.equal(
 				message1.headers.get("type")
@@ -162,7 +156,7 @@ describe("The message manager", () => {
 			const messages = await MessageModel.find().exec();
 			expect(messages.length).to.equal(1);
 			const message = messages[0];
-			expect(message._id.equals(message1._id)).to.be.true;
+			expect(message._id.equals(message2._id)).to.be.true;
 		});
 	});
 });
