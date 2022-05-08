@@ -1,13 +1,10 @@
 import Router from "@koa/router";
 import Joi from "joi";
-import bcrypt from "bcryptjs";
 import bodyValidator from "src/body_validator";
 import authHandler, { UserData } from "src/auth/handler";
 import userManager from "src/control/user_manager";
 
 const user = new Router({ prefix: "/user" });
-
-const PASSWORD_SALT_LENGTH = 10;
 
 interface CreateUserRequest {
 	username: string;
@@ -31,11 +28,11 @@ user.post("/create", bodyValidator(createUserSchema), async (ctx, next) => {
 	if (await userManager.usernameExists(body.username))
 		return ctx.throw(400, "User already exists");
 
-	const userCtr = await userManager.create({
-		username: body.username,
-		display: body.display,
-		passwordHash: bcrypt.hashSync(body.password, PASSWORD_SALT_LENGTH)
-	});
+	const userCtr = await userManager.createUser(
+		body.username,
+		body.password,
+		body.display
+	);
 
 	ctx.status = 201;
 	ctx.body = { id: userCtr.id.toHexString() };

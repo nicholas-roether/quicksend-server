@@ -31,11 +31,13 @@ class Controller<D extends DBObject> {
 		return this._doc._id;
 	}
 
-	get<F extends Exclude<keyof D & string, "_id">>(field: F): D[F] {
+	get<F extends Exclude<keyof D & string, "_id">>(field: F): D[F];
+	get<F extends Exclude<string, keyof D> | "_id">(field: F): undefined;
+	get(field: string) {
 		if (!this.isFieldDefined(field))
 			throw new ProjectionAccessError(this.modelName, field);
-		const value = this._doc[field];
-		return value;
+		if (field in this._doc) return this._doc[field as keyof D];
+		return undefined;
 	}
 
 	async delete() {
