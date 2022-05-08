@@ -5,8 +5,8 @@ function decompressRequests(ctx: Koa.Context) {
 	const encodingHeader = ctx.get("Content-Encoding");
 	if (!encodingHeader) return;
 	const encodings = encodingHeader.replace(/ /g, "").split(",");
-	let body: Buffer = Buffer.from(ctx.request.body);
-	for (const encoding of encodings) {
+	let body: Buffer = Buffer.from(ctx.request.body ?? "");
+	for (const encoding of encodings.reverse()) {
 		switch (encoding) {
 			case "gzip":
 				body = zlib.gunzipSync(body);
@@ -36,7 +36,7 @@ function acceptsEncoding(ctx: Koa.Context, encoding: string): boolean {
 }
 
 function compressResponse(ctx: Koa.Context) {
-	if (!ctx.state.compress) return;
+	if (!ctx.body || !ctx.state.compress) return;
 	if (!acceptsEncoding(ctx, "gzip")) return;
 
 	let body: Buffer;
