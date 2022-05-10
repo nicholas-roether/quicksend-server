@@ -94,7 +94,8 @@ describe("The device manager", () => {
 				signaturePublicKey: "657888796",
 				encryptionPublicKey: "jhgghjklkjh"
 			});
-			await Promise.all([testDevice.save(), testDevice2.save()]);
+			await testDevice.save();
+			await testDevice2.save();
 
 			const ctrs = await deviceManager.list(userId);
 			expect(ctrs.length).to.equal(2);
