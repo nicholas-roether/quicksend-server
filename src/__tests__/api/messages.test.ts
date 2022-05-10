@@ -662,3 +662,136 @@ describe("POST /messages/send", async () => {
 		});
 	});
 });
+
+describe("GET /messages/poll", () => {
+	createMongooseConnection();
+	let request: supertest.SuperTest<supertest.Test>;
+	before(() => {
+		request = supertest(createTestServer());
+	});
+
+	it("should not accept unauthorized requests and respond with 401", async () => {
+		const res = await request.get("/messages/poll").expect(401);
+		expect(res).to.not.have.property("data");
+	});
+
+	context("with Signature authorization", async () => {
+		const testKeypair = generateTestKeys();
+		let testUser: User;
+		let testDevice: Device;
+		let sign: Signer;
+		beforeEach(async () => {
+			const testUserDoc = new UserModel({
+				username: "some_user_564657",
+				passwordHash: "sfgghtfgjrtz"
+			});
+			await testUserDoc.save();
+			const testDeviceDoc = new DeviceModel({
+				name: "Test Device #87659800978",
+				user: testUserDoc._id,
+				signaturePublicKey: testKeypair.publicKey,
+				encryptionPublicKey: "gsdffhgjgjh"
+			});
+			await testDeviceDoc.save();
+			testUser = testUserDoc;
+			testDevice = testDeviceDoc;
+
+			sign = createSigner(
+				"get /messages/poll",
+				testDevice,
+				testKeypair.privateKey
+			);
+		});
+
+		it("should return an empty array if there are no messages", async () => {
+			const res = await sign(request.get("/messages/poll")).expect(200);
+			expect(res.body).to.deep.equal({ data: [] });
+		});
+
+		it("should return all messages to the authenticated device", async () => {
+			const sender = new mongoose.Types.ObjectId();
+			const testMsg1 = new MessageModel({
+				fromUser: sender,
+				toUser: testUser._id,
+				toDevice: testDevice._id,
+				sentAt: new Date(),
+				headers: {
+					type: "text/plain"
+				},
+				body: "Hi there!"
+			});
+			const testMsg2 = new MessageModel({
+				fromUser: testUser._id,
+				toUser: testUser._id,
+				toDevice: testDevice._id,
+				sentAt: new Date(),
+				headers: {
+					type: "text/plain"
+				},
+				body: "I'm sending this message to myself!"
+			});
+			await Promise.all([testMsg1.save(), testMsg2.save()]);
+
+			const res = await sign(request.get("/messages/poll")).expect(200);
+			expect(res.body).to.deep.equal({
+				data: [
+					{
+						fromUser: sender.toHexString(),
+						sentAt: testMsg1.sentAt.toISOString(),
+						headers: {
+							type: "text/plain"
+						},
+						body: "Hi there!"
+					},
+					{
+						fromUser: testUser._id.toHexString(),
+						sentAt: testMsg2.sentAt.toISOString(),
+						headers: {
+							type: "text/plain"
+						},
+						body: "I'm sending this message to myself!"
+					}
+				]
+			});
+		});
+
+		it("should return only messages to the authenticated device", async () => {
+			const sender = new mongoose.Types.ObjectId();
+			const testMsg1 = new MessageModel({
+				fromUser: sender,
+				toUser: testUser._id,
+				toDevice: testDevice._id,
+				sentAt: new Date(),
+				headers: {
+					type: "text/plain"
+				},
+				body: "Hi there!"
+			});
+			const testMsg2 = new MessageModel({
+				fromUser: testUser._id,
+				toUser: new mongoose.Types.ObjectId(),
+				toDevice: new mongoose.Types.ObjectId(),
+				sentAt: new Date(),
+				headers: {
+					type: "text/plain"
+				},
+				body: "This is private stuff!"
+			});
+			await Promise.all([testMsg1.save(), testMsg2.save()]);
+
+			const res = await sign(request.get("/messages/poll")).expect(200);
+			expect(res.body).to.deep.equal({
+				data: [
+					{
+						fromUser: sender.toHexString(),
+						sentAt: testMsg1.sentAt.toISOString(),
+						headers: {
+							type: "text/plain"
+						},
+						body: "Hi there!"
+					}
+				]
+			});
+		});
+	});
+});
