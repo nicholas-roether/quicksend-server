@@ -3,11 +3,12 @@ import Joi from "joi";
 import authHandler, { UserData } from "src/auth/handler";
 import bodyValidator from "src/body_validator";
 import deviceManager from "src/control/device_manager";
+import MessageController from "src/control/message_controller";
 import messageManager from "src/control/message_manager";
 import { ID } from "src/control/types";
 import userManager from "src/control/user_manager";
 import { isValidID } from "src/control/utils";
-import { arrayDiff } from "src/utils";
+import { arrayDiff, mapToRecord } from "src/utils";
 
 const messages = new Router({ prefix: "/messages" });
 messages.use(authHandler("Signature"));
@@ -93,10 +94,10 @@ messages.post("/send", bodyValidator(sendMessageSchema), async (ctx, next) => {
 messages.get("/poll", async (ctx, next) => {
 	const deviceId = ctx.state.device as ID;
 	const messageCtrs = await messageManager.poll(deviceId);
-	ctx.body = messageCtrs.map((messageCtr) => ({
-		fromUser: messageCtr.get("fromUser"),
-		sentAt: messageCtr.get("sentAt"),
-		headers: messageCtr.get("headers"),
+	ctx.body = messageCtrs.map((messageCtr: MessageController) => ({
+		fromUser: messageCtr.get("fromUser").toHexString(),
+		sentAt: messageCtr.get("sentAt").toISOString(),
+		headers: mapToRecord(messageCtr.get("headers")),
 		body: messageCtr.get("body")
 	}));
 

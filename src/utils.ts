@@ -50,6 +50,14 @@ function arrayDiff<T>(array: T[], reference: T[]): ArrayDiff<T> {
 	};
 }
 
+function mapToRecord<K extends string | number | symbol, V>(
+	map: Map<K, V>
+): Partial<Record<K, V>> {
+	const record: Partial<Record<K, V>> = {};
+	for (const [key, value] of map.entries()) record[key] = value;
+	return record;
+}
+
 export {
 	collapseWhitespace,
 	splitAtIndex,
@@ -57,7 +65,8 @@ export {
 	decodeBase64,
 	includesAll,
 	requireEnvVar,
-	arrayDiff
+	arrayDiff,
+	mapToRecord
 };
 
 export type { ArrayDiff };
