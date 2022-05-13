@@ -815,3 +815,86 @@ describe("GET /messages/poll", () => {
 		});
 	});
 });
+
+describe("POST /messages/clear", () => {
+	createMongooseConnection();
+	let request: supertest.SuperTest<supertest.Test>;
+	before(() => {
+		request = supertest(createTestServer());
+	});
+
+	it("should not accept unauthorized requests", async () => {
+		await request.post("/messages/clear").expect(401);
+	});
+
+	describe("with Signature authorization", () => {
+		const testKeypair = generateTestKeys();
+		let testDevice: Device;
+		let sign: Signer;
+		beforeEach(async () => {
+			const testUserDoc = new UserModel({
+				username: "some_user_564657",
+				passwordHash: "sfgghtfgjrtz"
+			});
+			await testUserDoc.save();
+			const testDeviceDoc = new DeviceModel({
+				name: "Test Device #87659800978",
+				user: testUserDoc._id,
+				signaturePublicKey: testKeypair.publicKey,
+				encryptionPublicKey: "gsdffhgjgjh"
+			});
+			await testDeviceDoc.save();
+			testDevice = testDeviceDoc;
+
+			sign = createSigner(
+				"post /messages/clear",
+				testDevice,
+				testKeypair.privateKey
+			);
+		});
+
+		it("should correctly delete keys", async () => {
+			const message1Doc = new MessageModel({
+				fromUser: new mongoose.Types.ObjectId(),
+				toUser: new mongoose.Types.ObjectId(),
+				keys: {
+					[testDevice._id.toHexString()]: "gdfhgfhjgjfhk",
+					fgdsfhgjgjfhkhjkg: "fgdhfjgjgkhfjkhg"
+				},
+				sentAt: new Date(),
+				body: "Message 1"
+			});
+			const message2Doc = new MessageModel({
+				fromUser: new mongoose.Types.ObjectId(),
+				toUser: new mongoose.Types.ObjectId(),
+				keys: {
+					[testDevice._id.toHexString()]: "hthgdfjfhjghjgfj"
+				},
+				sentAt: new Date(),
+				body: "Message 1"
+			});
+			const message3Doc = new MessageModel({
+				fromUser: new mongoose.Types.ObjectId(),
+				toUser: new mongoose.Types.ObjectId(),
+				keys: {
+					hgfjhgfghjfjhgjghk: "dfsgrhfghjgf"
+				},
+				sentAt: new Date(),
+				body: "Message 1"
+			});
+			await Promise.all([message1Doc.save(), message2Doc.save()]);
+			await message3Doc.save();
+
+			await sign(request.post("/messages/clear")).expect(200);
+
+			const messages = await MessageModel.find().exec();
+			expect(messages.length).to.equal(2);
+			const [message1, message3] = messages;
+			expect(message1._id.equals(message1Doc._id)).to.be.true;
+			expect(message1.keys.has(testDevice._id.toHexString())).to.be.false;
+			expect(message1.keys.has("fgdsfhgjgjfhkhjkg")).to.be.true;
+			expect(message3._id.equals(message3Doc._id)).to.be.true;
+			expect(message3.keys.has("hgfjhgfghjfjhgjghk")).to.be.true;
+		});
+	});
+});

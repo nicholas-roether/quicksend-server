@@ -105,4 +105,10 @@ messages.get("/poll", async (ctx, next) => {
 	return next();
 });
 
+messages.post("/clear", async (ctx, next) => {
+	const deviceId = ctx.state.device as ID;
+	await messageManager.clear(deviceId);
+	return next();
+});
+
 export default messages;
