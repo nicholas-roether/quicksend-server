@@ -5,6 +5,8 @@ import {
 	decodeBase64,
 	encodeBase64,
 	includesAll,
+	mapToRecord,
+	recordToMap,
 	requireEnvVar,
 	splitAtIndex
 } from "src/utils";
@@ -111,5 +113,37 @@ describe("arrayDiff()", () => {
 			missing: [2, 3, 6],
 			extra: [7, 9]
 		});
+	});
+});
+
+describe("mapToRecord()", () => {
+	it("should correctly convert maps to records", () => {
+		const map = new Map<string, unknown>();
+		map.set("val1", 2);
+		map.set("val2", "Hi!");
+		map.set("val3", [1, 2, 3]);
+
+		const record = mapToRecord(map);
+		expect(record).to.deep.equal({
+			val1: 2,
+			val2: "Hi!",
+			val3: [1, 2, 3]
+		});
+	});
+});
+
+describe("recordToMap()", () => {
+	it("should correctly convert records to maps", () => {
+		const record = {
+			val1: 2,
+			val2: "Hi!",
+			val3: [1, 2, 3]
+		};
+
+		const map = recordToMap(record);
+		expect(Array.from(map.keys())).to.deep.equal(["val1", "val2", "val3"]);
+		expect(map.get("val1")).to.equal(2);
+		expect(map.get("val2")).to.equal("Hi!");
+		expect(map.get("val3")).to.deep.equal([1, 2, 3]);
 	});
 });
