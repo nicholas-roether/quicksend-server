@@ -35,11 +35,8 @@ class UserManager extends Manager<User, UserController> {
 		});
 	}
 
-	protected createController(
-		document: Doc<User>,
-		proj?: string
-	): UserController {
-		return new UserController(document, proj);
+	protected createController(document: Doc<User>): UserController {
+		return new UserController(document);
 	}
 }
 

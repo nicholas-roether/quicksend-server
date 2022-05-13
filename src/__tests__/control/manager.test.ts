@@ -23,11 +23,8 @@ class TestObjManager extends Manager<TestObj, Controller<TestObj>> {
 		super(TestObjModel);
 	}
 
-	protected createController(
-		document: Doc<TestObj>,
-		proj?: string
-	): Controller<TestObj> {
-		return new Controller<TestObj>(document, proj);
+	protected createController(document: Doc<TestObj>): Controller<TestObj> {
+		return new Controller<TestObj>(document, ["val1", "val2"]);
 	}
 }
 

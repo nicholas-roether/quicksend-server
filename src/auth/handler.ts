@@ -61,10 +61,10 @@ async function authenticateSignature(
 	if (!includesAll(headers, ...signatureRequiredHeaders))
 		return ctx.throw(400, "missing reqired header for signature");
 	if (!isValidID(req.keyId)) ctx.throw(400, "invalid device id");
-	const device = await deviceManager.findID(
-		req.keyId,
-		"signaturePublicKey user"
-	);
+	const device = await deviceManager.findID(req.keyId, [
+		"signaturePublicKey",
+		"user"
+	]);
 	if (!device) return ctx.throw(401, "Unregistered device");
 
 	const signatureStr = createSignatureString(ctx, headers);

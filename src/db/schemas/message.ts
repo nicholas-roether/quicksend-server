@@ -1,12 +1,11 @@
 import mongoose from "mongoose";
-import DeviceModel from "src/db/models/device";
 import UserModel from "../models/user";
 import { DBObject } from "./base";
 
 interface Message extends DBObject {
 	fromUser: mongoose.Types.ObjectId;
 	toUser: mongoose.Types.ObjectId;
-	toDevice: mongoose.Types.ObjectId;
+	keys: Map<string, string>;
 	sentAt: Date;
 	headers: mongoose.Types.Map<string>;
 	body: string;
@@ -22,10 +21,10 @@ const MessageSchema = new mongoose.Schema<Message>({
 		type: mongoose.SchemaTypes.ObjectId,
 		required: true
 	},
-	toDevice: {
-		type: mongoose.SchemaTypes.ObjectId,
-		required: true,
-		ref: DeviceModel
+	keys: {
+		type: mongoose.SchemaTypes.Map,
+		of: String,
+		required: true
 	},
 	sentAt: { type: Date, required: true },
 	headers: {

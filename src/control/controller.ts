@@ -1,54 +1,68 @@
 import { DBObject } from "src/db/schemas/base";
-import { Doc, ObjectId } from "./types";
+import { DBObjField, Doc, ObjectId } from "./types";
 
 class ProjectionAccessError extends Error {
-	public readonly modelName: string;
 	public readonly field: string;
 
-	constructor(modelName: string, field: string) {
+	constructor(field: string) {
 		super(
-			`A ${modelName} controller tried to access the field '${field}', which was not defined in the projection provided at its creation.`
+			`An Accessor or Controller tried to access the field '${field}', which was not defined in the document it accessed.`
 		);
-		this.modelName = modelName;
 		this.field = field;
 	}
 }
 
-class Controller<D extends DBObject> {
-	private readonly _doc: Doc<D>;
-	private readonly definedFields: readonly string[] | null;
+class Accessor<D extends DBObject> {
+	private readonly obj: D;
+	private readonly defined: readonly string[];
 
-	constructor(document: Doc<D>, proj?: string) {
-		this._doc = document;
-		this.definedFields = proj ? proj.split(" ") : null;
-	}
-
-	get modelName(): string {
-		return this._doc.collection.name.replace(/s$/, "");
+	constructor(obj: D, defined: readonly DBObjField<D>[]) {
+		this.obj = obj;
+		this.defined = defined;
 	}
 
 	get id(): ObjectId {
-		return this._doc._id;
+		return this.obj._id;
 	}
 
-	get<F extends Exclude<keyof D & string, "_id">>(field: F): D[F];
-	get<F extends Exclude<string, keyof D> | "_id">(field: F): undefined;
-	get(field: string) {
-		if (!this.isFieldDefined(field))
-			throw new ProjectionAccessError(this.modelName, field);
-		if (field in this._doc.toObject() && field != "_id")
-			return this._doc[field as keyof D];
-		return undefined;
+	isDefined(field: string): field is DBObjField<D> {
+		return this.defined.includes(field);
+	}
+
+	get<F extends DBObjField<D>>(field: F): D[F];
+	get<F extends Exclude<string, DBObjField<D>>>(field: F): never;
+	get(field: string): unknown;
+	get(field: string): unknown {
+		if (!this.isDefined(field)) throw new ProjectionAccessError(field);
+		return this.obj[field];
+	}
+}
+
+class Controller<D extends DBObject> extends Accessor<D> {
+	private readonly doc: Doc<D>;
+
+	constructor(document: Doc<D>, defined: readonly DBObjField<D>[]) {
+		super(document, defined);
+		this.doc = document;
+	}
+
+	get modelName(): string {
+		return this.doc.collection.name.replace(/s$/, "");
+	}
+
+	get id(): ObjectId {
+		return this.doc._id;
+	}
+
+	async set<F extends DBObjField<D>>(field: F, val: Doc<D>[F]): Promise<void> {
+		this.doc[field] = val;
+		await this.doc.save();
 	}
 
 	async delete() {
-		return await this._doc.delete();
-	}
-
-	private isFieldDefined(field: string) {
-		if (!this.definedFields) return true;
-		return this.definedFields.includes(field);
+		return await this.doc.delete();
 	}
 }
 
 export default Controller;
+export { Accessor };

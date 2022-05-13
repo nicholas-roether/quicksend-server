@@ -5,4 +5,9 @@ function isValidID(id: ID) {
 	return mongoose.Types.ObjectId.isValid(id);
 }
 
-export { isValidID };
+function idToString(id: ID) {
+	if (typeof id == "string") return id;
+	return id.toHexString();
+}
+
+export { isValidID, idToString };

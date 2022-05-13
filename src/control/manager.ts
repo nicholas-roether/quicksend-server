@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import { DBObject } from "src/db/schemas/base";
 import Controller from "./controller";
-import { Doc, DocInit, ID } from "./types";
+import { DBObjField, Doc, DocInit, ID } from "./types";
 
 abstract class Manager<D extends DBObject, C extends Controller<D>> {
 	protected readonly Model: mongoose.Model<D>;
@@ -12,11 +12,11 @@ abstract class Manager<D extends DBObject, C extends Controller<D>> {
 
 	async findID(
 		id: mongoose.Types.ObjectId | string,
-		proj?: string
+		defined?: readonly DBObjField<D>[]
 	): Promise<C | null> {
-		const doc = await this.Model.findById(id, proj).exec();
+		const doc = await this.Model.findById(id, defined?.join(" ")).exec();
 		if (!doc) return null;
-		return this.createController(doc, proj);
+		return this.createController(doc, defined);
 	}
 
 	async create(data: DocInit<D>): Promise<C> {
@@ -39,10 +39,16 @@ abstract class Manager<D extends DBObject, C extends Controller<D>> {
 		return !!queryRes;
 	}
 
-	protected abstract createController(document: Doc<D>, proj?: string): C;
+	protected abstract createController(
+		document: Doc<D>,
+		defined?: readonly DBObjField<D>[]
+	): C;
 
-	protected createControllers(documents: Doc<D>[], proj?: string): C[] {
-		return documents.map((doc) => this.createController(doc, proj));
+	protected createControllers(
+		documents: Doc<D>[],
+		defined?: readonly DBObjField<D>[]
+	): C[] {
+		return documents.map((doc) => this.createController(doc, defined));
 	}
 }
 

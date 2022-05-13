@@ -405,9 +405,10 @@ describe("POST /messages/send", async () => {
 				.send({
 					to: testUser._id.toHexString(),
 					sentAt: date.toISOString(),
-					bodies: {
-						[testDevice2._id.toHexString()]: "Hello World"
-					}
+					keys: {
+						[testDevice2._id.toHexString()]: "75668798retujh"
+					},
+					body: "Hello World"
 				})
 				.expect(201);
 
@@ -416,7 +417,9 @@ describe("POST /messages/send", async () => {
 			const message = messages[0];
 			expect(message.fromUser.equals(testUser._id)).to.be.true;
 			expect(message.toUser.equals(testUser._id)).to.be.true;
-			expect(message.toDevice.equals(testDevice2._id)).to.be.true;
+			expect(message.keys.get(testDevice2._id.toHexString())).to.equal(
+				"75668798retujh"
+			);
 			expect(message.sentAt.getTime()).to.equal(date.getTime());
 			expect(message.headers.size).to.equal(0);
 			expect(message.body).to.equal("Hello World");
@@ -469,9 +472,10 @@ describe("POST /messages/send", async () => {
 					headers: {
 						type: "text/plain"
 					},
-					bodies: {
-						[testDevice2._id.toHexString()]: "Hello World"
-					}
+					keys: {
+						[testDevice2._id.toHexString()]: "4356576788546"
+					},
+					body: "Hello World"
 				})
 				.expect(201);
 
@@ -480,7 +484,9 @@ describe("POST /messages/send", async () => {
 			const message = messages[0];
 			expect(message.fromUser.equals(testUser._id)).to.be.true;
 			expect(message.toUser.equals(testUser._id)).to.be.true;
-			expect(message.toDevice.equals(testDevice2._id)).to.be.true;
+			expect(message.keys.get(testDevice2._id.toHexString())).to.equal(
+				"4356576788546"
+			);
 			expect(message.sentAt.getTime()).to.equal(date.getTime());
 			expect(message.headers.size).to.equal(1);
 			expect(message.headers.get("type")).to.equal("text/plain");
@@ -509,9 +515,10 @@ describe("POST /messages/send", async () => {
 					headers: {
 						type: "text/plain"
 					},
-					bodies: {
-						[someDevice._id.toHexString()]: "Hello World"
-					}
+					keys: {
+						[someDevice._id.toHexString()]: "Hgffjhkhlj"
+					},
+					body: "Hello World"
 				})
 				.expect(201);
 
@@ -520,7 +527,9 @@ describe("POST /messages/send", async () => {
 			const message = messages[0];
 			expect(message.fromUser.equals(testUser._id)).to.be.true;
 			expect(message.toUser.equals(otherUser._id)).to.be.true;
-			expect(message.toDevice.equals(someDevice._id)).to.be.true;
+			expect(message.keys.get(someDevice._id.toHexString())).to.equal(
+				"Hgffjhkhlj"
+			);
 			expect(message.sentAt.getTime()).to.equal(date.getTime());
 			expect(message.headers.size).to.equal(1);
 			expect(message.headers.get("type")).to.equal("text/plain");
@@ -557,32 +566,30 @@ describe("POST /messages/send", async () => {
 					headers: {
 						type: "text/plain"
 					},
-					bodies: {
-						[testDevice2._id.toHexString()]: "Hello TestDevice",
-						[someDevice._id.toHexString()]: "Hello SomeDevice"
-					}
+					keys: {
+						[testDevice2._id.toHexString()]: "dfhjjkjhllök",
+						[someDevice._id.toHexString()]: "hjfdggkllökj"
+					},
+					body: "Hello! :)"
 				})
 				.expect(201);
 
 			const messages = await MessageModel.find().exec();
-			expect(messages.length).to.equal(2);
-			const [message1, message2] = messages;
+			expect(messages.length).to.equal(1);
+			const message = messages[0];
 
-			expect(message1.fromUser.equals(testUser._id)).to.be.true;
-			expect(message1.toUser.equals(otherUser._id)).to.be.true;
-			expect(message1.toDevice.equals(testDevice2._id)).to.be.true;
-			expect(message1.sentAt.getTime()).to.equal(date.getTime());
-			expect(message1.headers.size).to.equal(1);
-			expect(message1.headers.get("type")).to.equal("text/plain");
-			expect(message1.body).to.equal("Hello TestDevice");
-
-			expect(message2.fromUser.equals(testUser._id)).to.be.true;
-			expect(message2.toUser.equals(otherUser._id)).to.be.true;
-			expect(message2.toDevice.equals(someDevice._id)).to.be.true;
-			expect(message2.sentAt.getTime()).to.equal(date.getTime());
-			expect(message2.headers.size).to.equal(1);
-			expect(message2.headers.get("type")).to.equal("text/plain");
-			expect(message2.body).to.equal("Hello SomeDevice");
+			expect(message.fromUser.equals(testUser._id)).to.be.true;
+			expect(message.toUser.equals(otherUser._id)).to.be.true;
+			expect(message.keys.get(testDevice2._id.toHexString())).to.equal(
+				"dfhjjkjhllök"
+			);
+			expect(message.keys.get(someDevice._id.toHexString())).to.equal(
+				"hjfdggkllökj"
+			);
+			expect(message.sentAt.getTime()).to.equal(date.getTime());
+			expect(message.headers.size).to.equal(1);
+			expect(message.headers.get("type")).to.equal("text/plain");
+			expect(message.body).to.equal("Hello! :)");
 		});
 
 		it("should return 400 for requests that are missing a device of the target user", async () => {
@@ -613,9 +620,10 @@ describe("POST /messages/send", async () => {
 					headers: {
 						type: "text/plain"
 					},
-					bodies: {
-						[someDevice._id.toHexString()]: "Hello World"
-					}
+					keys: {
+						[someDevice._id.toHexString()]: "fghdjkghjkhg"
+					},
+					body: "dfsghhjgf"
 				})
 				.expect(400);
 
@@ -651,9 +659,10 @@ describe("POST /messages/send", async () => {
 					headers: {
 						type: "text/plain"
 					},
-					bodies: {
-						[someDevice._id.toHexString()]: "Hello World"
-					}
+					keys: {
+						[someDevice._id.toHexString()]: "fghfgjhkklhjg"
+					},
+					body: "fgsdghfdjhfg"
 				})
 				.expect(400);
 
@@ -713,7 +722,9 @@ describe("GET /messages/poll", () => {
 			const testMsg1 = new MessageModel({
 				fromUser: sender,
 				toUser: testUser._id,
-				toDevice: testDevice._id,
+				keys: {
+					[testDevice._id.toHexString()]: "dfsfdgshdghf"
+				},
 				sentAt: new Date(),
 				headers: {
 					type: "text/plain"
@@ -723,7 +734,9 @@ describe("GET /messages/poll", () => {
 			const testMsg2 = new MessageModel({
 				fromUser: testUser._id,
 				toUser: testUser._id,
-				toDevice: testDevice._id,
+				keys: {
+					[testDevice._id.toHexString()]: "54656732"
+				},
 				sentAt: new Date(),
 				headers: {
 					type: "text/plain"
@@ -741,6 +754,7 @@ describe("GET /messages/poll", () => {
 						headers: {
 							type: "text/plain"
 						},
+						key: "dfsfdgshdghf",
 						body: "Hi there!"
 					},
 					{
@@ -749,6 +763,7 @@ describe("GET /messages/poll", () => {
 						headers: {
 							type: "text/plain"
 						},
+						key: "54656732",
 						body: "I'm sending this message to myself!"
 					}
 				]
@@ -760,7 +775,9 @@ describe("GET /messages/poll", () => {
 			const testMsg1 = new MessageModel({
 				fromUser: sender,
 				toUser: testUser._id,
-				toDevice: testDevice._id,
+				keys: {
+					[testDevice._id.toHexString()]: "dfsg hfgjjgkhzf"
+				},
 				sentAt: new Date(),
 				headers: {
 					type: "text/plain"
@@ -770,7 +787,9 @@ describe("GET /messages/poll", () => {
 			const testMsg2 = new MessageModel({
 				fromUser: testUser._id,
 				toUser: new mongoose.Types.ObjectId(),
-				toDevice: new mongoose.Types.ObjectId(),
+				keys: {
+					[new mongoose.Types.ObjectId().toHexString()]: "sdfgfghd"
+				},
 				sentAt: new Date(),
 				headers: {
 					type: "text/plain"
@@ -788,6 +807,7 @@ describe("GET /messages/poll", () => {
 						headers: {
 							type: "text/plain"
 						},
+						key: "dfsg hfgjjgkhzf",
 						body: "Hi there!"
 					}
 				]

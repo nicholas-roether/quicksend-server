@@ -1,10 +1,22 @@
 import { Device } from "src/db/schemas/device";
 import Controller from "./controller";
-import { Doc } from "./types";
+import { DBObjField, Doc } from "./types";
 
 class DeviceController extends Controller<Device> {
-	constructor(document: Doc<Device>, proj?: string) {
-		super(document, proj);
+	constructor(document: Doc<Device>, defined?: readonly DBObjField<Device>[]) {
+		super(
+			document,
+			defined ?? [
+				"createdAt",
+				"encryptionPublicKey",
+				"lastActivity",
+				"name",
+				"signaturePublicKey",
+				"type",
+				"updatedAt",
+				"user"
+			]
+		);
 	}
 }
 

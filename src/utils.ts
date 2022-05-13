@@ -58,6 +58,14 @@ function mapToRecord<K extends string | number | symbol, V>(
 	return record;
 }
 
+function recordToMap<K extends string | number | symbol, V>(
+	record: Record<K, V>
+): Map<K, V> {
+	const map = new Map<K, V>();
+	for (const key in record) map.set(key, record[key]);
+	return map;
+}
+
 export {
 	collapseWhitespace,
 	splitAtIndex,
@@ -66,7 +74,8 @@ export {
 	includesAll,
 	requireEnvVar,
 	arrayDiff,
-	mapToRecord
+	mapToRecord,
+	recordToMap
 };
 
 export type { ArrayDiff };

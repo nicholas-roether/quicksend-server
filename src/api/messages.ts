@@ -2,9 +2,9 @@ import Router from "@koa/router";
 import Joi from "joi";
 import authHandler, { UserData } from "src/auth/handler";
 import bodyValidator from "src/body_validator";
+import { Accessor } from "src/control/controller";
 import deviceManager from "src/control/device_manager";
-import MessageController from "src/control/message_controller";
-import messageManager from "src/control/message_manager";
+import messageManager, { MessageToDevice } from "src/control/message_manager";
 import { ID } from "src/control/types";
 import userManager from "src/control/user_manager";
 import { isValidID } from "src/control/utils";
@@ -37,21 +37,23 @@ interface SendMessageRequest {
 	to: string;
 	sentAt: string;
 	headers: Record<string, string>;
-	bodies: Record<string, string>;
+	keys: Record<string, string>;
+	body: string;
 }
 
 const sendMessageSchema = Joi.object<SendMessageRequest>({
 	to: Joi.string().required(),
 	sentAt: Joi.string().isoDate().required(),
 	headers: Joi.object().pattern(Joi.string(), Joi.string()).optional(),
-	bodies: Joi.object().pattern(Joi.string(), Joi.string()).required()
+	keys: Joi.object().pattern(Joi.string(), Joi.string()).required(),
+	body: Joi.string().required()
 });
 
 const MESSAGE_AGE_LIMIT = 300000; // 5 minutes
 
 messages.post("/send", bodyValidator(sendMessageSchema), async (ctx, next) => {
 	const userData = ctx.state.user as UserData;
-	const { to, sentAt, headers, bodies } = ctx.request
+	const { to, sentAt, headers, keys, body } = ctx.request
 		.body as SendMessageRequest;
 	if (!isValidID(to)) return ctx.throw(400, "Invalid recipient user id");
 	if (!(await userManager.idExists(to)))
@@ -70,22 +72,20 @@ messages.post("/send", bodyValidator(sendMessageSchema), async (ctx, next) => {
 	);
 	const targetIds = targets.map((device) => device.id.toHexString());
 
-	const idDiff = arrayDiff(Object.keys(bodies), targetIds);
+	const idDiff = arrayDiff(Object.keys(keys), targetIds);
 	if (idDiff.missing.length > 0)
 		return ctx.throw(400, "Missing required target device(s)");
 	if (idDiff.extra.length > 0)
 		return ctx.throw(400, "Extraneous unknown device(s)");
 
-	await messageManager.createMany(
-		Object.entries(bodies).map(([deviceId, body]) => ({
-			fromUser: userData.id,
-			toUser: to,
-			toDevice: deviceId,
-			sentAt: new Date(sentAt),
-			headers,
-			body
-		}))
-	);
+	await messageManager.create({
+		fromUser: userData.id,
+		toUser: to,
+		sentAt: new Date(sentAt),
+		headers,
+		keys,
+		body
+	});
 
 	ctx.status = 201;
 	return next();
@@ -94,10 +94,11 @@ messages.post("/send", bodyValidator(sendMessageSchema), async (ctx, next) => {
 messages.get("/poll", async (ctx, next) => {
 	const deviceId = ctx.state.device as ID;
 	const messageCtrs = await messageManager.poll(deviceId);
-	ctx.body = messageCtrs.map((messageCtr: MessageController) => ({
+	ctx.body = messageCtrs.map((messageCtr: Accessor<MessageToDevice>) => ({
 		fromUser: messageCtr.get("fromUser").toHexString(),
 		sentAt: messageCtr.get("sentAt").toISOString(),
 		headers: mapToRecord(messageCtr.get("headers")),
+		key: messageCtr.get("key"),
 		body: messageCtr.get("body")
 	}));
 

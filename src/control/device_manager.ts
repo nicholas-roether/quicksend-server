@@ -2,7 +2,7 @@ import DeviceModel from "src/db/models/device";
 import { Device } from "src/db/schemas/device";
 import DeviceController from "./device_controller";
 import Manager from "./manager";
-import { Doc, ID } from "./types";
+import { DBObjField, Doc, ID } from "./types";
 
 class DeviceManager extends Manager<Device, DeviceController> {
 	constructor() {
@@ -20,8 +20,14 @@ class DeviceManager extends Manager<Device, DeviceController> {
 	}
 
 	async list(user: ID): Promise<DeviceController[]> {
-		const proj = "name type lastActivity createdAt updatedAt";
-		const docs = await this.Model.find({ user }).select(proj).exec();
+		const proj: readonly DBObjField<Device>[] = [
+			"name",
+			"type",
+			"lastActivity",
+			"createdAt",
+			"updatedAt"
+		];
+		const docs = await this.Model.find({ user }).select(proj.join(" ")).exec();
 		return this.createControllers(docs, proj);
 	}
 
@@ -35,14 +41,11 @@ class DeviceManager extends Manager<Device, DeviceController> {
 			.where({ _id: { $ne: senderDevice } })
 			.select("encryptionPublicKey")
 			.exec();
-		return this.createControllers(docs, "encryptionPublicKey");
+		return this.createControllers(docs);
 	}
 
-	protected createController(
-		document: Doc<Device>,
-		proj?: string
-	): DeviceController {
-		return new DeviceController(document, proj);
+	protected createController(document: Doc<Device>): DeviceController {
+		return new DeviceController(document);
 	}
 }
 
