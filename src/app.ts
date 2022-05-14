@@ -1,16 +1,33 @@
 import Koa from "koa";
+import cors from "koa-cors";
 import errorHandler from "./errors";
-import router from "./router";
 import responseHandler from "./response";
 import compress from "./compress";
+import bodyParser from "koa-bodyparser";
+import user from "./api/user";
+import devices from "./api/devices";
+import messages from "./api/messages";
 
 const app = new Koa();
 
-app.use(compress());
-app.use(responseHandler());
-app.use(errorHandler());
+const middleware = [
+	cors(),
+	compress(),
+	bodyParser(),
+	responseHandler(),
+	errorHandler(),
+	user.routes(),
+	user.allowedMethods(),
+	devices.routes(),
+	devices.allowedMethods(),
+	messages.routes(),
+	messages.allowedMethods()
+];
 
-app.use(router.routes());
-app.use(router.allowedMethods());
+function applyMiddleware(app: Koa) {
+	middleware.forEach((mw) => app.use(mw));
+}
+
+applyMiddleware(app);
 
 export default app;

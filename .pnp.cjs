@@ -38,6 +38,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/chai", "npm:4.3.1"],\
             ["@types/koa", "npm:2.13.4"],\
             ["@types/koa-bodyparser", "npm:4.3.7"],\
+            ["@types/koa-cors", "npm:0.0.2"],\
             ["@types/koa__router", "npm:8.0.11"],\
             ["@types/mocha", "npm:9.1.1"],\
             ["@types/node", "npm:17.0.25"],\
@@ -55,6 +56,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["joi", "npm:17.6.0"],\
             ["koa", "npm:2.13.4"],\
             ["koa-bodyparser", "npm:4.3.0"],\
+            ["koa-cors", "npm:0.0.16"],\
             ["koa-create-context", "virtual:3f21ca9c8a3e63ea383a746855cfaf47b3034c621a23173fe87a8eaf7a65cd6ff9bf1137241c8ddb28e6e85bad7cd29945d90eaeda5d23da0057669986a44e5a#npm:1.0.2"],\
             ["mocha", "npm:9.2.2"],\
             ["mongoose", "npm:6.3.1"],\
@@ -857,6 +859,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/@types-koa-compose-npm-3.2.5-b9ab25d904-5d1147c4b0.zip/node_modules/@types/koa-compose/",\
           "packageDependencies": [\
             ["@types/koa-compose", "npm:3.2.5"],\
+            ["@types/koa", "npm:2.13.4"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@types/koa-cors", [\
+        ["npm:0.0.2", {\
+          "packageLocation": "./.yarn/cache/@types-koa-cors-npm-0.0.2-c6764a76ab-7218bd8f46.zip/node_modules/@types/koa-cors/",\
+          "packageDependencies": [\
+            ["@types/koa-cors", "npm:0.0.2"],\
             ["@types/koa", "npm:2.13.4"]\
           ],\
           "linkType": "HARD"\
@@ -4119,6 +4131,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["koa-cors", [\
+        ["npm:0.0.16", {\
+          "packageLocation": "./.yarn/cache/koa-cors-npm-0.0.16-fd4e3e7806-66d85b7a48.zip/node_modules/koa-cors/",\
+          "packageDependencies": [\
+            ["koa-cors", "npm:0.0.16"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["koa-create-context", [\
         ["npm:1.0.2", {\
           "packageLocation": "./.yarn/cache/koa-create-context-npm-1.0.2-b3c5f8d262-a516a1dc06.zip/node_modules/koa-create-context/",\
@@ -5189,6 +5210,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/chai", "npm:4.3.1"],\
             ["@types/koa", "npm:2.13.4"],\
             ["@types/koa-bodyparser", "npm:4.3.7"],\
+            ["@types/koa-cors", "npm:0.0.2"],\
             ["@types/koa__router", "npm:8.0.11"],\
             ["@types/mocha", "npm:9.1.1"],\
             ["@types/node", "npm:17.0.25"],\
@@ -5206,6 +5228,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["joi", "npm:17.6.0"],\
             ["koa", "npm:2.13.4"],\
             ["koa-bodyparser", "npm:4.3.0"],\
+            ["koa-cors", "npm:0.0.16"],\
             ["koa-create-context", "virtual:3f21ca9c8a3e63ea383a746855cfaf47b3034c621a23173fe87a8eaf7a65cd6ff9bf1137241c8ddb28e6e85bad7cd29945d90eaeda5d23da0057669986a44e5a#npm:1.0.2"],\
             ["mocha", "npm:9.2.2"],\
             ["mongoose", "npm:6.3.1"],\
