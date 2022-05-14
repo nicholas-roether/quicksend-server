@@ -51,7 +51,7 @@ function createSignatureString(ctx: Koa.Context, headers: string[]) {
 	return signatureStr;
 }
 
-const signatureRequiredHeaders = ["(request-target)", "date"];
+const signatureRequiredHeaders = ["(request-target)", "x-date"];
 
 async function authenticateSignature(
 	ctx: Koa.Context,
@@ -59,7 +59,7 @@ async function authenticateSignature(
 ) {
 	const headers = req.headers ?? ["date"];
 	if (!includesAll(headers, ...signatureRequiredHeaders))
-		return ctx.throw(400, "missing reqired header for signature");
+		return ctx.throw(400, "missing required header for signature");
 	if (!isValidID(req.keyId)) ctx.throw(400, "invalid device id");
 	const device = await deviceManager.findID(req.keyId, [
 		"signaturePublicKey",

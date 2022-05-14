@@ -157,8 +157,8 @@ describe("the authHandler() middleware", function () {
 
 			ctx.url = "/test";
 			ctx.method = "POST";
-			ctx.request.header.date = date.toUTCString();
-			ctx.request.header.authorization = `Signature keyId="${new mongoose.Types.ObjectId().toHexString()}",signature="${signature}",headers="(request-target) date"`;
+			ctx.request.header["x-date"] = date.toUTCString();
+			ctx.request.header.authorization = `Signature keyId="${new mongoose.Types.ObjectId().toHexString()}",signature="${signature}",headers="(request-target) x-date"`;
 
 			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
 			expect(ctx.throw.calledOnceWith(401)).to.be.true;
@@ -188,8 +188,8 @@ describe("the authHandler() middleware", function () {
 
 			ctx.url = "/test";
 			ctx.method = "GET";
-			ctx.request.header.date = date.toUTCString();
-			ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}",headers="(request-target) date"`;
+			ctx.request.header["x-date"] = date.toUTCString();
+			ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}",headers="(request-target) x-date"`;
 
 			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
 			expect(ctx.throw.calledOnceWith(401)).to.be.true;
@@ -209,8 +209,8 @@ describe("the authHandler() middleware", function () {
 
 			ctx.url = "/test";
 			ctx.method = "GET";
-			ctx.request.header.date = date.toUTCString();
-			ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}",headers="(request-target) date"`;
+			ctx.request.header["x-date"] = date.toUTCString();
+			ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}",headers="(request-target) x-date"`;
 
 			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
 			expect(ctx.throw.calledOnceWith(401)).to.be.true;
@@ -231,8 +231,8 @@ describe("the authHandler() middleware", function () {
 
 			ctx.url = "/test";
 			ctx.method = "GET";
-			ctx.request.header.date = date.toUTCString();
-			ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}",headers="(request-target) date"`;
+			ctx.request.header["x-date"] = date.toUTCString();
+			ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}",headers="(request-target) x-date"`;
 
 			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
 			expect(ctx.throw.calledOnceWith(401)).to.be.true;
@@ -253,7 +253,7 @@ describe("the authHandler() middleware", function () {
 
 			ctx.url = "/test";
 			ctx.method = "GET";
-			ctx.request.header.date = date.toUTCString();
+			ctx.request.header["x-date"] = date.toUTCString();
 			ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}"`;
 
 			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
@@ -268,15 +268,15 @@ describe("the authHandler() middleware", function () {
 			const device = await createTestDevice(user._id, keyPair);
 
 			const date = new Date();
-			const signatureStr = `(request-target): get /test\ndate: ${date.toUTCString()}\n`;
+			const signatureStr = `(request-target): get /test\nx-date: ${date.toUTCString()}\n`;
 			const signature = crypto
 				.sign(null, Buffer.from(signatureStr), keyPair.privateKey)
 				.toString("base64");
 
 			ctx.url = "/test";
 			ctx.method = "GET";
-			ctx.request.header.date = date.toUTCString();
-			ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}",headers="(request-target) date"`;
+			ctx.request.header["x-date"] = date.toUTCString();
+			ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}",headers="(request-target) x-date"`;
 
 			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
 			expect(ctx.throw.called).to.be.false;
@@ -295,16 +295,16 @@ describe("the authHandler() middleware", function () {
 			const device = await createTestDevice(user._id, keyPair);
 
 			const date = new Date();
-			const signatureStr = `(request-target): get /test\ndate: ${date.toUTCString()}\nx-test: test\n`;
+			const signatureStr = `(request-target): get /test\nx-date: ${date.toUTCString()}\nx-test: test\n`;
 			const signature = crypto
 				.sign(null, Buffer.from(signatureStr), keyPair.privateKey)
 				.toString("base64");
 
 			ctx.url = "/test";
 			ctx.method = "GET";
-			ctx.request.header.date = date.toUTCString();
+			ctx.request.header["x-date"] = date.toUTCString();
 			ctx.request.header["x-test"] = "test";
-			ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}",headers="(request-target) date x-test"`;
+			ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}",headers="(request-target) x-date x-test"`;
 
 			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
 			expect(ctx.throw.called).to.be.false;
@@ -330,8 +330,8 @@ describe("the authHandler() middleware", function () {
 
 			ctx.url = "/test";
 			ctx.method = "GET";
-			ctx.request.header.date = date.toUTCString();
-			ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}",headers="date"`;
+			ctx.request.header["x-date"] = date.toUTCString();
+			ctx.request.header.authorization = `Signature keyId="${device._id.toHexString()}",signature="${signature}",headers="x-date"`;
 
 			await catchMiddlewareErrors(authHandler("Signature"), ctx, next);
 			expect(ctx.throw.calledOnceWith(400)).to.be.true;

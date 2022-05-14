@@ -9,13 +9,15 @@ function createSigner(target: string, device: Device, key: string): Signer {
 		const date = new Date();
 		const signatureStr = `(request-target): ${
 			target + path
-		}\ndate: ${date.toUTCString()}\n`;
+		}\nx-date: ${date.toUTCString()}\n`;
 		const signature = crypto
 			.sign(null, Buffer.from(signatureStr), key)
 			.toString("base64");
-		const authHeader = `Signature keyId="${device._id.toHexString()}",signature="${signature}",headers="(request-target) date"`;
+		const authHeader = `Signature keyId="${device._id.toHexString()}",signature="${signature}",headers="(request-target) x-date"`;
 
-		return req.set("Date", date.toUTCString()).set("Authorization", authHeader);
+		return req
+			.set("X-Date", date.toUTCString())
+			.set("Authorization", authHeader);
 	};
 }
 
