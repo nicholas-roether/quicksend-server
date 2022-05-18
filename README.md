@@ -8,12 +8,16 @@ of this repository, as well as as of yet unimplemented concepts.
 
 Currently, the following API routes are implemented:
 - `/user`
-  - `/create`: Creating new users
-  - `/info`:   Get information about the authenticated user
+  - POST `/create`: Creating new users
+  - GET  `/info`:   Get information about the authenticated user
 - `/devices`
-  - `/add`:    Add a new device for the authenticated user
-  - `/remove`: Remove a device for the authenticated user
-  - `/list`:   List all devices registered for the authenticated user
+  - POST `/add`:    Add a new device for the authenticated user
+  - POST `/remove`: Remove a device for the authenticated user
+  - GET `/list`:    List all devices registered for the authenticated user
+- `/messages`
+  - POST `/send`:   Send a new message
+  - GET `/poll`:    Get a list of all new messages
+  - POST `/clear`:  Clear the list of new messages for this device
 
 ### Authentication
 
@@ -25,26 +29,26 @@ registered via `/devices/add`, in accordance with
 [this outdated IETF draft](https://tools.ietf.org/id/draft-cavage-http-signatures-12.html),
 and as such with the `WWW-Authenticate` header sent by the server.
 
+### Compression
 
-## Concepts
-
-The following are ideas for the future of this project that are both vague and subject to change.
+Requests can be compressed according to the HTTP standard with gzip or deflate.
 
 ### Messages
 
-Messages mean those that are sent from one user to another, and are
-seperate from any medium in which they might be stored or via which they might be conveyed.
-
-Messages should consist of two parts: the message headers and the message body, where the headers,
+Messages consist of two parts: the message headers and the message body, where the headers,
 among other possible uses, tell the client how the body is to be interpreted. In order to be able
 to send data of any (possibly binary) format, the following headers are
-under consideration:
+recommended:
 
 - `type`:         the MIME type of the body content (default: `"text/plain"`)
 - `encoding`:     the encoding of the body content
   - valid values: `"utf-8"` (default), `"base64"`
 
 Large messages, such as those containing images, will also be compressed during transit.
+
+## Concepts
+
+The following are ideas for the future of this project that are both vague and subject to change.
 
 
 ### Socket Server
