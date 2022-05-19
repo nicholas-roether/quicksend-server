@@ -9,7 +9,7 @@ of this repository, as well as as of yet unimplemented concepts.
 Currently, the following API routes are implemented:
 - `/user`
   - POST `/create`: Creating new users
-  - GET  `/info`:   Get information about the authenticated user
+  - GET  `/info`:   Get information about a user
 - `/devices`
   - POST `/add`:    Add a new device for the authenticated user
   - POST `/remove`: Remove a device for the authenticated user
@@ -21,7 +21,7 @@ Currently, the following API routes are implemented:
 
 ### Authentication
 
-Apart from `/user/create`, authorization is required for all routes. In the case of
+Apart from `/user`, authorization is required for all routes. In the case of
 `/devices/add`, this is done via
 [HTTP Basic authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Authorization#basic),
 in all other cases it is required to create a valid digital signature for a device previously

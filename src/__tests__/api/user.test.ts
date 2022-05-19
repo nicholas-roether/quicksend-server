@@ -110,7 +110,27 @@ describe("GET /user/info", () => {
 		testUser = user;
 	});
 
-	it("should respond with 401 to unauthorized requests", async () => {
+	it("should return the correct data for a provided ID", async () => {
+		const user2 = new UserModel({
+			username: "some-other-user",
+			display: "fdgshfgdjhgjf",
+			passwordHash: "fgsdghjffghjkgjhk"
+		});
+		await user2.save();
+
+		const response = await request
+			.get(`/user/info/${user2._id.toHexString()}`)
+			.expect(200);
+		expect(response.body).to.deep.equal({
+			data: {
+				id: user2._id.toHexString(),
+				username: user2.username,
+				display: user2.display
+			}
+		});
+	});
+
+	it("should respond with 401 to unauthenticated requests if no ID is provided", async () => {
 		const response = await request.get("/user/info").expect(401);
 		expect(response).to.not.have.property("data");
 	});
@@ -131,7 +151,7 @@ describe("GET /user/info", () => {
 			sign = createSigner("get /user/info", testDevice, testKeypair.privateKey);
 		});
 
-		it("should return the correct user data", async () => {
+		it("should return the correct user data for the authenticated user", async () => {
 			const response = await sign(request.get("/user/info")).expect(200);
 			expect(response.body).to.deep.equal({
 				data: {

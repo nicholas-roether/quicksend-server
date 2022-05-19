@@ -3,6 +3,7 @@ import Joi from "joi";
 import bodyValidator from "src/body_validator";
 import authHandler, { UserData } from "src/auth/handler";
 import userManager from "src/control/user_manager";
+import { isValidID } from "src/control/utils";
 
 const user = new Router({ prefix: "/user" });
 
@@ -46,6 +47,21 @@ user.get("/info", authHandler("Signature"), async (ctx, next) => {
 		id: userData.id.toHexString(),
 		username: userData.username,
 		display: userData.display
+	};
+
+	return next();
+});
+
+user.get("/info/:id", async (ctx, next) => {
+	const id = ctx.params.id;
+	if (!isValidID(id)) return ctx.throw(400, "Invalid user id");
+
+	const userCtr = await userManager.findID(id, ["username", "display"]);
+	if (!userCtr) return ctx.throw(400, "User does not exist");
+	ctx.body = {
+		id: userCtr.id.toHexString(),
+		username: userCtr.get("username"),
+		display: userCtr.get("display")
 	};
 
 	return next();
