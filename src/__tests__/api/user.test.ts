@@ -8,6 +8,7 @@ import { User } from "src/db/schemas/user";
 import { createSigner, Signer } from "../__utils__/signature";
 import { generateTestKeys } from "../__utils__/rsa";
 import DeviceModel from "src/db/models/device";
+import mongoose from "mongoose";
 
 describe("POST /user/create", function () {
 	createMongooseConnection();
@@ -110,6 +111,10 @@ describe("GET /user/info", () => {
 		testUser = user;
 	});
 
+	it("should return 400 for invalid user IDs", async () => {
+		await request.get("/user/info/fdgsdf ghjjgfkhz").expect(400);
+	});
+
 	it("should return the correct data for a provided ID", async () => {
 		const user2 = new UserModel({
 			username: "some-other-user",
@@ -128,6 +133,13 @@ describe("GET /user/info", () => {
 				display: user2.display
 			}
 		});
+	});
+
+	it("should return null for user IDs that do not exist", async () => {
+		const response = await request
+			.get(`/user/info/${new mongoose.Types.ObjectId().toHexString()}`)
+			.expect(200);
+		expect(response.body).to.be.null;
 	});
 
 	it("should respond with 401 to unauthenticated requests if no ID is provided", async () => {

@@ -57,7 +57,7 @@ user.get("/info/:id", async (ctx, next) => {
 	if (!isValidID(id)) return ctx.throw(400, "Invalid user id");
 
 	const userCtr = await userManager.findID(id, ["username", "display"]);
-	if (!userCtr) return ctx.throw(400, "User does not exist");
+	if (!userCtr) return null;
 	ctx.body = {
 		id: userCtr.id.toHexString(),
 		username: userCtr.get("username"),
