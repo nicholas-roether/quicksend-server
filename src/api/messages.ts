@@ -96,6 +96,7 @@ messages.get("/poll", async (ctx, next) => {
 	const messageCtrs = await messageManager.poll(deviceId);
 	ctx.body = messageCtrs.map((messageCtr: Accessor<MessageToDevice>) => ({
 		fromUser: messageCtr.get("fromUser").toHexString(),
+		incoming: messageCtr.get("incoming"),
 		sentAt: messageCtr.get("sentAt").toISOString(),
 		headers: mapToRecord(messageCtr.get("headers")),
 		key: messageCtr.get("key"),

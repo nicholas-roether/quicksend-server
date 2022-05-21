@@ -750,6 +750,7 @@ describe("GET /messages/poll", () => {
 				data: [
 					{
 						fromUser: sender.toHexString(),
+						incoming: true,
 						sentAt: testMsg1.sentAt.toISOString(),
 						headers: {
 							type: "text/plain"
@@ -759,6 +760,7 @@ describe("GET /messages/poll", () => {
 					},
 					{
 						fromUser: testUser._id.toHexString(),
+						incoming: false,
 						sentAt: testMsg2.sentAt.toISOString(),
 						headers: {
 							type: "text/plain"
@@ -803,6 +805,7 @@ describe("GET /messages/poll", () => {
 				data: [
 					{
 						fromUser: sender.toHexString(),
+						incoming: true,
 						sentAt: testMsg1.sentAt.toISOString(),
 						headers: {
 							type: "text/plain"
