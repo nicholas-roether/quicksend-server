@@ -138,8 +138,8 @@ describe("GET /user/info", () => {
 	it("should return null for user IDs that do not exist", async () => {
 		const response = await request
 			.get(`/user/info/${new mongoose.Types.ObjectId().toHexString()}`)
-			.expect(200);
-		expect(response.body).to.be.null;
+			.expect(204);
+		expect(response.body.data).to.be.undefined;
 	});
 
 	it("should respond with 401 to unauthenticated requests if no ID is provided", async () => {
