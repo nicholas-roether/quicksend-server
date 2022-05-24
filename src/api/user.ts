@@ -59,10 +59,27 @@ user.get("/info/:id", async (ctx, next) => {
 	const userCtr = await userManager.findID(id, ["username", "display"]);
 	if (!userCtr) {
 		ctx.body = null;
-		return;
+		return next();
 	}
 	ctx.body = {
 		id: userCtr.id.toHexString(),
+		username: userCtr.get("username"),
+		display: userCtr.get("display")
+	};
+
+	return next();
+});
+
+user.get("/find/:name", async (ctx, next) => {
+	const username = ctx.params.name;
+
+	const userCtr = await userManager.findUsername(username);
+	if (!userCtr) {
+		ctx.body = null;
+		return next();
+	}
+	ctx.body = {
+		id: userCtr.id,
 		username: userCtr.get("username"),
 		display: userCtr.get("display")
 	};

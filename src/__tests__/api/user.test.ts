@@ -175,3 +175,34 @@ describe("GET /user/info", () => {
 		});
 	});
 });
+
+describe("GET /user/find", () => {
+	createMongooseConnection();
+	let request: supertest.SuperTest<supertest.Test>;
+
+	before(() => {
+		request = supertest(createTestServer());
+	});
+
+	it("should return null if the user doesn't exsit", async () => {
+		const res = await request.get("/user/find/test-user").expect(204);
+		expect(res.body.data).to.be.undefined;
+	});
+
+	it("should return the correct user data if the user exsists", async () => {
+		const user = new UserModel({
+			username: "test-user",
+			passwordHash: "fgsgdfhhjgf",
+			display: "sfdgghfd hjtfg"
+		});
+		await user.save();
+		const res = await request.get("/user/find/test-user").expect(200);
+		expect(res.body).to.deep.equal({
+			data: {
+				id: user._id.toHexString(),
+				username: user.username,
+				display: user.display
+			}
+		});
+	});
+});
