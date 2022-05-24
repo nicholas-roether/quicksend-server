@@ -25,10 +25,10 @@ messages.get("/targets/:userId", async (ctx, next) => {
 		ctx.state.device
 	);
 
-	const ids: string[] = deviceCtrs.map((deviceCtr) =>
-		deviceCtr.get("encryptionPublicKey")
-	);
-	ctx.body = ids;
+	const targets: Record<string, string> = {};
+	for (const deviceCtr of deviceCtrs)
+		targets[deviceCtr.id.toHexString()] = deviceCtr.get("encryptionPublicKey");
+	ctx.body = targets;
 
 	return next();
 });

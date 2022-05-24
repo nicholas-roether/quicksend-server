@@ -67,7 +67,7 @@ describe("GET /messages/targets", () => {
 				).expect(200);
 
 				expect(res.body).to.deep.equal({
-					data: []
+					data: {}
 				});
 			});
 
@@ -95,10 +95,14 @@ describe("GET /messages/targets", () => {
 				).expect(200);
 
 				expect(res.body).to.deep.equal({
-					data: [
-						testDevice2.encryptionPublicKey,
-						testDevice3.encryptionPublicKey
-					]
+					// data: [
+					// 	testDevice2.encryptionPublicKey,
+					// 	testDevice3.encryptionPublicKey
+					// ]
+					data: {
+						[testDevice2._id.toHexString()]: testDevice2.encryptionPublicKey,
+						[testDevice3._id.toHexString()]: testDevice3.encryptionPublicKey
+					}
 				});
 			});
 
@@ -118,7 +122,7 @@ describe("GET /messages/targets", () => {
 				).expect(200);
 
 				expect(res.body).to.deep.equal({
-					data: []
+					data: {}
 				});
 			});
 		});
@@ -153,10 +157,11 @@ describe("GET /messages/targets", () => {
 				).expect(200);
 
 				expect(res.body).to.deep.equal({
-					data: [
-						someDevice.encryptionPublicKey,
-						someOtherDevice.encryptionPublicKey
-					]
+					data: {
+						[someDevice._id.toHexString()]: someDevice.encryptionPublicKey,
+						[someOtherDevice._id.toHexString()]:
+							someOtherDevice.encryptionPublicKey
+					}
 				});
 			});
 
@@ -198,11 +203,12 @@ describe("GET /messages/targets", () => {
 				).expect(200);
 
 				expect(res.body).to.deep.equal({
-					data: [
-						testDevice2.encryptionPublicKey,
-						someDevice.encryptionPublicKey,
-						someOtherDevice.encryptionPublicKey
-					]
+					data: {
+						[testDevice2._id.toHexString()]: testDevice2.encryptionPublicKey,
+						[someDevice._id.toHexString()]: someDevice.encryptionPublicKey,
+						[someOtherDevice._id.toHexString()]:
+							someOtherDevice.encryptionPublicKey
+					}
 				});
 			});
 		});
