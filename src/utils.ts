@@ -66,6 +66,16 @@ function recordToMap<K extends string | number | symbol, V>(
 	return map;
 }
 
+function mapObject<V, R>(
+	obj: Record<string, V>,
+	callback: (val: V, key: string) => R
+): Record<string, R> {
+	const returnObj = {} as Record<string, R>;
+	for (const [key, val] of Object.entries(obj))
+		returnObj[key] = callback(val, key);
+	return returnObj;
+}
+
 export {
 	collapseWhitespace,
 	splitAtIndex,
@@ -75,7 +85,8 @@ export {
 	requireEnvVar,
 	arrayDiff,
 	mapToRecord,
-	recordToMap
+	recordToMap,
+	mapObject
 };
 
 export type { ArrayDiff };

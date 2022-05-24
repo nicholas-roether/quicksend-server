@@ -2,6 +2,7 @@ import { expect } from "chai";
 import mongoose from "mongoose";
 import messageManager from "src/control/message_manager";
 import MessageModel from "src/db/models/message";
+import { encodeBase64 } from "src/utils";
 import { createMongooseConnection } from "../__utils__/mongoose";
 
 describe("The message manager", () => {
@@ -21,6 +22,7 @@ describe("The message manager", () => {
 				keys: {
 					[deviceId._id.toHexString()]: "gdfshjfggjhklhklj"
 				},
+				iv: "fdsggfdhjhgfjghk",
 				sentAt: new Date(),
 				headers: {
 					type: "text/plain"
@@ -34,6 +36,7 @@ describe("The message manager", () => {
 					[deviceId._id.toHexString()]: "gdfddfgjhjhgkjkl",
 					[new mongoose.Types.ObjectId().toHexString()]: "sfgrdghfdjfhg"
 				},
+				iv: "fgsghfdhgfdhjfg",
 				sentAt: new Date(),
 				headers: {
 					type: "application/json"
@@ -49,20 +52,22 @@ describe("The message manager", () => {
 			expect(ctr1.id.equals(message1._id)).to.be.true;
 			expect(ctr1.get("fromUser").equals(message1.fromUser)).to.be.true;
 			expect(ctr1.get("sentAt").getTime()).to.equal(message1.sentAt.getTime());
-			expect(ctr1.get("key")).to.equal("gdfshjfggjhklhklj");
+			expect(ctr1.get("key").toString()).to.equal("gdfshjfggjhklhklj");
+			expect(ctr1.get("iv").toString()).to.equal("fdsggfdhjhgfjghk");
 			expect(ctr1.get("headers").get("type")).to.equal(
 				message1.headers.get("type")
 			);
-			expect(ctr1.get("body")).to.equal(message1.body);
+			expect(ctr1.get("body").toString()).to.equal(message1.body.toString());
 
 			expect(ctr2.id.equals(message2._id)).to.be.true;
 			expect(ctr2.get("fromUser").equals(message2.fromUser)).to.be.true;
 			expect(ctr2.get("sentAt").getTime()).to.equal(message2.sentAt.getTime());
-			expect(ctr2.get("key")).to.equal("gdfddfgjhjhgkjkl");
+			expect(ctr2.get("key").toString()).to.equal("gdfddfgjhjhgkjkl");
+			expect(ctr2.get("iv").toString()).to.equal("fgsghfdhgfdhjfg");
 			expect(ctr2.get("headers").get("type")).to.equal(
 				message2.headers.get("type")
 			);
-			expect(ctr2.get("body")).to.equal(message2.body);
+			expect(ctr2.get("body").toString()).to.equal(message2.body.toString());
 		});
 
 		it("should only return messages that belong to the specified device", async () => {
@@ -77,7 +82,8 @@ describe("The message manager", () => {
 				headers: {
 					type: "text/plain"
 				},
-				body: "Message 1"
+				iv: "gfsgfdhhjgfhjg",
+				body: encodeBase64("Message 1")
 			});
 			const message2 = new MessageModel({
 				fromUser: new mongoose.Types.ObjectId(),
@@ -85,6 +91,7 @@ describe("The message manager", () => {
 				keys: {
 					[new mongoose.Types.ObjectId().toHexString()]: "sdfggfhdhfjg"
 				},
+				iv: "fsggfhdhfg",
 				sentAt: new Date(),
 				headers: {
 					type: "application/json"
@@ -100,11 +107,11 @@ describe("The message manager", () => {
 			expect(ctr.id.equals(message1._id)).to.be.true;
 			expect(ctr.get("fromUser").equals(message1.fromUser)).to.be.true;
 			expect(ctr.get("sentAt").getTime()).to.equal(message1.sentAt.getTime());
-			expect(ctr.get("key")).to.equal("dfsgghfjdjhfg");
+			expect(ctr.get("key").toString()).to.equal("dfsgghfjdjhfg");
 			expect(ctr.get("headers").get("type")).to.equal(
 				message1.headers.get("type")
 			);
-			expect(ctr.get("body")).to.equal(message1.body);
+			expect(ctr.get("body").toString()).to.equal(message1.body.toString());
 		});
 	});
 
@@ -122,6 +129,7 @@ describe("The message manager", () => {
 					[deviceId.toHexString()]: "fsgdgfdhhjfg",
 					gfdhfgjjhgjfgh: "sdgfrdfghhgfjdhjgf"
 				},
+				iv: "sfggfhdfhjg",
 				body: "Message 1"
 			});
 			const message2Doc = new MessageModel({
@@ -135,6 +143,7 @@ describe("The message manager", () => {
 					[deviceId.toHexString()]: "dsfggdhfsjhgf",
 					gfdhfgjjhgjfgh: "gfdssfdg"
 				},
+				iv: "fdsdgfhgdhfg",
 				body: "Message 2"
 			});
 			await message1Doc.save();
@@ -165,6 +174,7 @@ describe("The message manager", () => {
 				keys: {
 					[deviceId.toHexString()]: "fsgdgfdhhjfg"
 				},
+				iv: "fggfdhhfgjjhgf",
 				body: "Message 1"
 			});
 			await message.save();

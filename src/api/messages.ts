@@ -8,7 +8,7 @@ import messageManager, { MessageToDevice } from "src/control/message_manager";
 import { ID, ObjectId } from "src/control/types";
 import userManager from "src/control/user_manager";
 import { isValidID } from "src/control/utils";
-import { arrayDiff, mapToRecord } from "src/utils";
+import { arrayDiff, mapObject, mapToRecord } from "src/utils";
 
 const messages = new Router({ prefix: "/messages" });
 messages.use(authHandler("Signature"));
@@ -38,6 +38,7 @@ interface SendMessageRequest {
 	sentAt: string;
 	headers: Record<string, string>;
 	keys: Record<string, string>;
+	iv: string;
 	body: string;
 }
 
@@ -46,6 +47,7 @@ const sendMessageSchema = Joi.object<SendMessageRequest>({
 	sentAt: Joi.string().isoDate().required(),
 	headers: Joi.object().pattern(Joi.string(), Joi.string()).optional(),
 	keys: Joi.object().pattern(Joi.string(), Joi.string()).required(),
+	iv: Joi.string().required(),
 	body: Joi.string().required()
 });
 
@@ -53,7 +55,7 @@ const MESSAGE_AGE_LIMIT = 300000; // 5 minutes
 
 messages.post("/send", bodyValidator(sendMessageSchema), async (ctx, next) => {
 	const userData = ctx.state.user as UserData;
-	const { to, sentAt, headers, keys, body } = ctx.request
+	const { to, sentAt, headers, keys, iv, body } = ctx.request
 		.body as SendMessageRequest;
 	if (!isValidID(to)) return ctx.throw(400, "Invalid recipient user id");
 	if (!(await userManager.idExists(to)))
@@ -83,8 +85,9 @@ messages.post("/send", bodyValidator(sendMessageSchema), async (ctx, next) => {
 		toUser: to,
 		sentAt: new Date(sentAt),
 		headers,
-		keys,
-		body
+		keys: mapObject(keys, (key) => Buffer.from(key, "base64")),
+		iv: Buffer.from(iv, "base64"),
+		body: Buffer.from(body, "base64")
 	});
 
 	ctx.status = 201;
@@ -103,8 +106,9 @@ messages.get("/poll", async (ctx, next) => {
 			incoming,
 			sentAt: messageCtr.get("sentAt").toISOString(),
 			headers: mapToRecord(messageCtr.get("headers")),
-			key: messageCtr.get("key"),
-			body: messageCtr.get("body")
+			key: messageCtr.get("key").toString("base64"),
+			iv: messageCtr.get("iv").toString("base64"),
+			body: messageCtr.get("body").toString("base64")
 		};
 	});
 

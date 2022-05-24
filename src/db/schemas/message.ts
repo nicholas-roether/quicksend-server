@@ -5,10 +5,11 @@ import { DBObject } from "./base";
 interface Message extends DBObject {
 	fromUser: mongoose.Types.ObjectId;
 	toUser: mongoose.Types.ObjectId;
-	keys: Map<string, string>;
+	keys: Map<string, mongoose.Types.Buffer>;
+	iv: mongoose.Types.Buffer;
 	sentAt: Date;
 	headers: mongoose.Types.Map<string>;
-	body: string;
+	body: mongoose.Types.Buffer;
 }
 
 const MessageSchema = new mongoose.Schema<Message>({
@@ -23,7 +24,11 @@ const MessageSchema = new mongoose.Schema<Message>({
 	},
 	keys: {
 		type: mongoose.SchemaTypes.Map,
-		of: String,
+		of: mongoose.SchemaTypes.Buffer,
+		required: true
+	},
+	iv: {
+		type: mongoose.SchemaTypes.Buffer,
 		required: true
 	},
 	sentAt: { type: Date, required: true },
@@ -32,7 +37,7 @@ const MessageSchema = new mongoose.Schema<Message>({
 		of: String,
 		default: new Map<string, string>()
 	},
-	body: { type: String, required: true }
+	body: { type: mongoose.SchemaTypes.Buffer, required: true }
 });
 
 export default MessageSchema;

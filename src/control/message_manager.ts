@@ -15,8 +15,9 @@ interface MessageToDevice extends DBObject {
 	incoming: boolean;
 	sentAt: Date;
 	headers: Map<string, string>;
-	key: string;
-	body: string;
+	key: Buffer;
+	iv: Buffer;
+	body: Buffer;
 }
 
 class MessageManager extends Manager<Message, MessageController> {
@@ -38,6 +39,7 @@ class MessageManager extends Manager<Message, MessageController> {
 				sentAt: 1,
 				headers: 1,
 				key: `$keys.${idStr}`,
+				iv: 1,
 				body: 1
 			})
 			.exec();
@@ -49,7 +51,16 @@ class MessageManager extends Manager<Message, MessageController> {
 						sentAt: new Date(doc.sentAt),
 						headers: recordToMap(doc.headers as Record<string, string>)
 					},
-					["fromUser", "toUser", "incoming", "sentAt", "headers", "key", "body"]
+					[
+						"fromUser",
+						"toUser",
+						"incoming",
+						"sentAt",
+						"headers",
+						"key",
+						"iv",
+						"body"
+					]
 				)
 		);
 	}

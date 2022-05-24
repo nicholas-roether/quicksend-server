@@ -5,6 +5,7 @@ import MessageModel from "src/db/models/message";
 import UserModel from "src/db/models/user";
 import { Device } from "src/db/schemas/device";
 import { User } from "src/db/schemas/user";
+import { encodeBase64 } from "src/utils";
 import supertest from "supertest";
 import { createMongooseConnection } from "../__utils__/mongoose";
 import { generateTestKeys } from "../__utils__/rsa";
@@ -412,9 +413,10 @@ describe("POST /messages/send", async () => {
 					to: testUser._id.toHexString(),
 					sentAt: date.toISOString(),
 					keys: {
-						[testDevice2._id.toHexString()]: "75668798retujh"
+						[testDevice2._id.toHexString()]: encodeBase64("75668798retujh")
 					},
-					body: "Hello World"
+					iv: encodeBase64("dfgsgfdhfhgj"),
+					body: encodeBase64("Hello World")
 				})
 				.expect(201);
 
@@ -423,12 +425,13 @@ describe("POST /messages/send", async () => {
 			const message = messages[0];
 			expect(message.fromUser.equals(testUser._id)).to.be.true;
 			expect(message.toUser.equals(testUser._id)).to.be.true;
-			expect(message.keys.get(testDevice2._id.toHexString())).to.equal(
-				"75668798retujh"
-			);
+			expect(
+				message.keys.get(testDevice2._id.toHexString())?.toString()
+			).to.equal("75668798retujh");
+			expect(message.iv.toString()).to.equal("dfgsgfdhfhgj");
 			expect(message.sentAt.getTime()).to.equal(date.getTime());
 			expect(message.headers.size).to.equal(0);
-			expect(message.body).to.equal("Hello World");
+			expect(message.body.toString()).to.equal("Hello World");
 		});
 
 		it("should respond with 400 to requests that don't specify a bodies field", async () => {
@@ -479,9 +482,10 @@ describe("POST /messages/send", async () => {
 						type: "text/plain"
 					},
 					keys: {
-						[testDevice2._id.toHexString()]: "4356576788546"
+						[testDevice2._id.toHexString()]: encodeBase64("4356576788546")
 					},
-					body: "Hello World"
+					iv: encodeBase64("sgfddfgsgfhd"),
+					body: encodeBase64("Hello World")
 				})
 				.expect(201);
 
@@ -490,13 +494,14 @@ describe("POST /messages/send", async () => {
 			const message = messages[0];
 			expect(message.fromUser.equals(testUser._id)).to.be.true;
 			expect(message.toUser.equals(testUser._id)).to.be.true;
-			expect(message.keys.get(testDevice2._id.toHexString())).to.equal(
-				"4356576788546"
-			);
+			expect(
+				message.keys.get(testDevice2._id.toHexString())?.toString()
+			).to.equal("4356576788546");
+			expect(message.iv.toString()).to.equal("sgfddfgsgfhd");
 			expect(message.sentAt.getTime()).to.equal(date.getTime());
 			expect(message.headers.size).to.equal(1);
 			expect(message.headers.get("type")).to.equal("text/plain");
-			expect(message.body).to.equal("Hello World");
+			expect(message.body.toString()).to.equal("Hello World");
 		});
 
 		it("should save correctly formed messages to others to the database", async () => {
@@ -522,9 +527,10 @@ describe("POST /messages/send", async () => {
 						type: "text/plain"
 					},
 					keys: {
-						[someDevice._id.toHexString()]: "Hgffjhkhlj"
+						[someDevice._id.toHexString()]: encodeBase64("Hgffjhkhlj")
 					},
-					body: "Hello World"
+					iv: encodeBase64("sgfddfgsgfhd"),
+					body: encodeBase64("Hello World")
 				})
 				.expect(201);
 
@@ -533,13 +539,14 @@ describe("POST /messages/send", async () => {
 			const message = messages[0];
 			expect(message.fromUser.equals(testUser._id)).to.be.true;
 			expect(message.toUser.equals(otherUser._id)).to.be.true;
-			expect(message.keys.get(someDevice._id.toHexString())).to.equal(
-				"Hgffjhkhlj"
-			);
+			expect(
+				message.keys.get(someDevice._id.toHexString())?.toString()
+			).to.equal("Hgffjhkhlj");
+			expect(message.iv.toString()).to.equal("sgfddfgsgfhd");
 			expect(message.sentAt.getTime()).to.equal(date.getTime());
 			expect(message.headers.size).to.equal(1);
 			expect(message.headers.get("type")).to.equal("text/plain");
-			expect(message.body).to.equal("Hello World");
+			expect(message.body.toString()).to.equal("Hello World");
 		});
 
 		it("should save correctly formed messages to others and other devices of the same user", async () => {
@@ -573,10 +580,11 @@ describe("POST /messages/send", async () => {
 						type: "text/plain"
 					},
 					keys: {
-						[testDevice2._id.toHexString()]: "dfhjjkjhllök",
-						[someDevice._id.toHexString()]: "hjfdggkllökj"
+						[testDevice2._id.toHexString()]: encodeBase64("dfhjjkjhllök"),
+						[someDevice._id.toHexString()]: encodeBase64("hjfdggkllökj")
 					},
-					body: "Hello! :)"
+					iv: encodeBase64("dfggdfhfhghgfj"),
+					body: encodeBase64("Hello! :)")
 				})
 				.expect(201);
 
@@ -586,16 +594,17 @@ describe("POST /messages/send", async () => {
 
 			expect(message.fromUser.equals(testUser._id)).to.be.true;
 			expect(message.toUser.equals(otherUser._id)).to.be.true;
-			expect(message.keys.get(testDevice2._id.toHexString())).to.equal(
-				"dfhjjkjhllök"
-			);
-			expect(message.keys.get(someDevice._id.toHexString())).to.equal(
-				"hjfdggkllökj"
-			);
+			expect(
+				message.keys.get(testDevice2._id.toHexString())?.toString()
+			).to.equal("dfhjjkjhllök");
+			expect(
+				message.keys.get(someDevice._id.toHexString())?.toString()
+			).to.equal("hjfdggkllökj");
+			expect(message.iv.toString()).to.equal("dfggdfhfhghgfj");
 			expect(message.sentAt.getTime()).to.equal(date.getTime());
 			expect(message.headers.size).to.equal(1);
 			expect(message.headers.get("type")).to.equal("text/plain");
-			expect(message.body).to.equal("Hello! :)");
+			expect(message.body.toString()).to.equal("Hello! :)");
 		});
 
 		it("should return 400 for requests that are missing a device of the target user", async () => {
@@ -731,6 +740,7 @@ describe("GET /messages/poll", () => {
 				keys: {
 					[testDevice._id.toHexString()]: "dfsfdgshdghf"
 				},
+				iv: "dgfhfhgjgfjhgjhfjgh",
 				sentAt: new Date(),
 				headers: {
 					type: "text/plain"
@@ -743,6 +753,7 @@ describe("GET /messages/poll", () => {
 				keys: {
 					[testDevice._id.toHexString()]: "54656732"
 				},
+				iv: "fdsggdfhhfgjdfhjg",
 				sentAt: new Date(),
 				headers: {
 					type: "text/plain"
@@ -761,8 +772,9 @@ describe("GET /messages/poll", () => {
 						headers: {
 							type: "text/plain"
 						},
-						key: "dfsfdgshdghf",
-						body: "Hi there!"
+						key: encodeBase64("dfsfdgshdghf"),
+						iv: encodeBase64("dgfhfhgjgfjhgjhfjgh"),
+						body: encodeBase64("Hi there!")
 					},
 					{
 						chat: sender.toHexString(),
@@ -771,8 +783,9 @@ describe("GET /messages/poll", () => {
 						headers: {
 							type: "text/plain"
 						},
-						key: "54656732",
-						body: "This is an outgoing message"
+						key: encodeBase64("54656732"),
+						iv: encodeBase64("fdsggdfhhfgjdfhjg"),
+						body: encodeBase64("This is an outgoing message")
 					}
 				]
 			});
@@ -786,6 +799,7 @@ describe("GET /messages/poll", () => {
 				keys: {
 					[testDevice._id.toHexString()]: "dfsg hfgjjgkhzf"
 				},
+				iv: "sfdggfdhhjgfjhftg",
 				sentAt: new Date(),
 				headers: {
 					type: "text/plain"
@@ -798,6 +812,7 @@ describe("GET /messages/poll", () => {
 				keys: {
 					[new mongoose.Types.ObjectId().toHexString()]: "sdfgfghd"
 				},
+				iv: "fsggfhdjfghhjkghk",
 				sentAt: new Date(),
 				headers: {
 					type: "text/plain"
@@ -816,8 +831,9 @@ describe("GET /messages/poll", () => {
 						headers: {
 							type: "text/plain"
 						},
-						key: "dfsg hfgjjgkhzf",
-						body: "Hi there!"
+						key: encodeBase64("dfsg hfgjjgkhzf"),
+						iv: encodeBase64("sfdggfdhhjgfjhftg"),
+						body: encodeBase64("Hi there!")
 					}
 				]
 			});
@@ -870,6 +886,7 @@ describe("POST /messages/clear", () => {
 					[testDevice._id.toHexString()]: "gdfhgfhjgjfhk",
 					fgdsfhgjgjfhkhjkg: "fgdhfjgjgkhfjkhg"
 				},
+				iv: "gfdsfhgjjghf",
 				sentAt: new Date(),
 				body: "Message 1"
 			});
@@ -879,6 +896,7 @@ describe("POST /messages/clear", () => {
 				keys: {
 					[testDevice._id.toHexString()]: "hthgdfjfhjghjgfj"
 				},
+				iv: "gfsghdffhg",
 				sentAt: new Date(),
 				body: "Message 1"
 			});
@@ -888,6 +906,7 @@ describe("POST /messages/clear", () => {
 				keys: {
 					hgfjhgfghjfjhgjghk: "dfsgrhfghjgf"
 				},
+				iv: "dfsggfhdfgh",
 				sentAt: new Date(),
 				body: "Message 1"
 			});
