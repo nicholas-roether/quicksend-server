@@ -70,7 +70,7 @@ class MessageManager extends Manager<Message, MessageController> {
 			{},
 			{ $unset: { [`keys.${deviceId.toString()}`]: "" } }
 		);
-		await this.Model.deleteOne({ keys: {} });
+		await this.Model.deleteMany({ keys: {} });
 	}
 }
 const messageManager = new MessageManager();
