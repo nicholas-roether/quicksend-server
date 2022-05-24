@@ -739,7 +739,7 @@ describe("GET /messages/poll", () => {
 			});
 			const testMsg2 = new MessageModel({
 				fromUser: testUser._id,
-				toUser: testUser._id,
+				toUser: sender,
 				keys: {
 					[testDevice._id.toHexString()]: "54656732"
 				},
@@ -747,7 +747,7 @@ describe("GET /messages/poll", () => {
 				headers: {
 					type: "text/plain"
 				},
-				body: "I'm sending this message to myself!"
+				body: "This is an outgoing message"
 			});
 			await Promise.all([testMsg1.save(), testMsg2.save()]);
 
@@ -755,7 +755,7 @@ describe("GET /messages/poll", () => {
 			expect(res.body).to.deep.equal({
 				data: [
 					{
-						fromUser: sender.toHexString(),
+						chat: sender.toHexString(),
 						incoming: true,
 						sentAt: testMsg1.sentAt.toISOString(),
 						headers: {
@@ -765,14 +765,14 @@ describe("GET /messages/poll", () => {
 						body: "Hi there!"
 					},
 					{
-						fromUser: testUser._id.toHexString(),
+						chat: sender.toHexString(),
 						incoming: false,
 						sentAt: testMsg2.sentAt.toISOString(),
 						headers: {
 							type: "text/plain"
 						},
 						key: "54656732",
-						body: "I'm sending this message to myself!"
+						body: "This is an outgoing message"
 					}
 				]
 			});
@@ -810,7 +810,7 @@ describe("GET /messages/poll", () => {
 			expect(res.body).to.deep.equal({
 				data: [
 					{
-						fromUser: sender.toHexString(),
+						chat: sender.toHexString(),
 						incoming: true,
 						sentAt: testMsg1.sentAt.toISOString(),
 						headers: {

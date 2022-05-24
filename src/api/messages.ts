@@ -5,7 +5,7 @@ import bodyValidator from "src/body_validator";
 import { Accessor } from "src/control/controller";
 import deviceManager from "src/control/device_manager";
 import messageManager, { MessageToDevice } from "src/control/message_manager";
-import { ID } from "src/control/types";
+import { ID, ObjectId } from "src/control/types";
 import userManager from "src/control/user_manager";
 import { isValidID } from "src/control/utils";
 import { arrayDiff, mapToRecord } from "src/utils";
@@ -93,15 +93,20 @@ messages.post("/send", bodyValidator(sendMessageSchema), async (ctx, next) => {
 
 messages.get("/poll", async (ctx, next) => {
 	const deviceId = ctx.state.device as ID;
+	const userId = ctx.state.user.id as ObjectId;
 	const messageCtrs = await messageManager.poll(deviceId);
-	ctx.body = messageCtrs.map((messageCtr: Accessor<MessageToDevice>) => ({
-		fromUser: messageCtr.get("fromUser").toHexString(),
-		incoming: messageCtr.get("incoming"),
-		sentAt: messageCtr.get("sentAt").toISOString(),
-		headers: mapToRecord(messageCtr.get("headers")),
-		key: messageCtr.get("key"),
-		body: messageCtr.get("body")
-	}));
+
+	ctx.body = messageCtrs.map((messageCtr: Accessor<MessageToDevice>) => {
+		const incoming = userId.equals(messageCtr.get("toUser"));
+		return {
+			chat: incoming ? messageCtr.get("fromUser") : messageCtr.get("toUser"),
+			incoming,
+			sentAt: messageCtr.get("sentAt").toISOString(),
+			headers: mapToRecord(messageCtr.get("headers")),
+			key: messageCtr.get("key"),
+			body: messageCtr.get("body")
+		};
+	});
 
 	return next();
 });

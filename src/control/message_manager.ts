@@ -11,6 +11,7 @@ import { idToString } from "./utils";
 
 interface MessageToDevice extends DBObject {
 	fromUser: mongoose.Types.ObjectId;
+	toUser: mongoose.Types.ObjectId;
 	incoming: boolean;
 	sentAt: Date;
 	headers: Map<string, string>;
@@ -33,9 +34,7 @@ class MessageManager extends Manager<Message, MessageController> {
 			.match({ [`keys.${idStr}`]: { $exists: true } })
 			.project({
 				fromUser: 1,
-				incoming: {
-					$ne: ["$fromUser", "$toUser"]
-				},
+				toUser: 1,
 				sentAt: 1,
 				headers: 1,
 				key: `$keys.${idStr}`,
@@ -50,7 +49,7 @@ class MessageManager extends Manager<Message, MessageController> {
 						sentAt: new Date(doc.sentAt),
 						headers: recordToMap(doc.headers as Record<string, string>)
 					},
-					["fromUser", "incoming", "sentAt", "headers", "key", "body"]
+					["fromUser", "toUser", "incoming", "sentAt", "headers", "key", "body"]
 				)
 		);
 	}
