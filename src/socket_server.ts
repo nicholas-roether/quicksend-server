@@ -31,7 +31,7 @@ class SocketServer extends EventEmitter {
 
 	handler(): Koa.Middleware<Koa.DefaultState, SocketContext> {
 		return async (ctx, next) => {
-			const userId = this.authenticate(ctx);
+			const userId = await this.authenticate(ctx);
 			if (!userId) return next();
 			this.subsribeSocket(userId, ctx.websocket);
 			return next();
@@ -67,26 +67,28 @@ class SocketServer extends EventEmitter {
 		ctx.websocket.close(code, msg);
 	}
 
-	private authenticate(ctx: SocketContext): ObjectId | null {
-		if (!ctx.header.authorization) {
-			this.error(ctx, 401, "Must provide an authorization header");
-			return null;
-		}
-		const [scheme, token] = ctx.header.authorization.split(" ");
-		if (scheme != "Token") {
-			this.error(
-				ctx,
-				400,
-				"Unsupported authorization scheme; must use 'Token'"
-			);
-			return null;
-		}
-		const userId = this.tokenMap.get(token);
-		if (!userId) {
-			this.error(ctx, 401, "Invalid auth token");
-			return null;
-		}
-		return userId;
+	private async authenticate(ctx: SocketContext): Promise<ObjectId | null> {
+		return await new Promise((res) => {
+			const authListener = (data: ws.RawData) => {
+				ctx.websocket.removeListener("message", authListener);
+				const userId = this.tokenMap.get(data.toString("base64"));
+				if (!userId) {
+					this.error(ctx, 401, "Invalid auth token");
+					res(null);
+					return;
+				}
+				res(userId);
+			};
+			ctx.websocket.on("message", authListener);
+			setTimeout(() => {
+				ctx.websocket.removeListener("message", authListener);
+				this.error(
+					ctx,
+					400,
+					"Must provide authentication token within 5 seconds of connection"
+				);
+			}, 5000);
+		});
 	}
 }
 
