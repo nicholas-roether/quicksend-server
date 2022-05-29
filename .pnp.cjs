@@ -39,11 +39,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/koa", "npm:2.13.4"],\
             ["@types/koa-bodyparser", "npm:4.3.7"],\
             ["@types/koa-cors", "npm:0.0.2"],\
+            ["@types/koa-websocket", "npm:5.0.7"],\
             ["@types/koa__router", "npm:8.0.11"],\
             ["@types/mocha", "npm:9.1.1"],\
             ["@types/node", "npm:17.0.25"],\
             ["@types/sinon", "npm:10.0.11"],\
             ["@types/supertest", "npm:2.0.12"],\
+            ["@types/ws", "npm:8.5.3"],\
             ["@typescript-eslint/eslint-plugin", "virtual:3f21ca9c8a3e63ea383a746855cfaf47b3034c621a23173fe87a8eaf7a65cd6ff9bf1137241c8ddb28e6e85bad7cd29945d90eaeda5d23da0057669986a44e5a#npm:5.20.0"],\
             ["@typescript-eslint/parser", "virtual:3f21ca9c8a3e63ea383a746855cfaf47b3034c621a23173fe87a8eaf7a65cd6ff9bf1137241c8ddb28e6e85bad7cd29945d90eaeda5d23da0057669986a44e5a#npm:5.20.0"],\
             ["bcryptjs", "npm:2.4.3"],\
@@ -58,6 +60,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["koa-bodyparser", "npm:4.3.0"],\
             ["koa-cors", "npm:0.0.16"],\
             ["koa-create-context", "virtual:3f21ca9c8a3e63ea383a746855cfaf47b3034c621a23173fe87a8eaf7a65cd6ff9bf1137241c8ddb28e6e85bad7cd29945d90eaeda5d23da0057669986a44e5a#npm:1.0.2"],\
+            ["koa-websocket", "npm:7.0.0"],\
             ["mocha", "npm:9.2.2"],\
             ["mongoose", "npm:6.3.1"],\
             ["nyc", "npm:15.1.0"],\
@@ -69,7 +72,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["ts-node", "virtual:3f21ca9c8a3e63ea383a746855cfaf47b3034c621a23173fe87a8eaf7a65cd6ff9bf1137241c8ddb28e6e85bad7cd29945d90eaeda5d23da0057669986a44e5a#npm:10.7.0"],\
             ["ts-node-dev", "virtual:3f21ca9c8a3e63ea383a746855cfaf47b3034c621a23173fe87a8eaf7a65cd6ff9bf1137241c8ddb28e6e85bad7cd29945d90eaeda5d23da0057669986a44e5a#npm:1.1.8"],\
             ["tslib", "npm:2.4.0"],\
-            ["typescript", "patch:typescript@npm%3A4.6.3#~builtin<compat/typescript>::version=4.6.3&hash=bda367"]\
+            ["typescript", "patch:typescript@npm%3A4.6.3#~builtin<compat/typescript>::version=4.6.3&hash=bda367"],\
+            ["ws", "virtual:2e76bd341a54292ea03a86a4ef8c55ccb8cf00c8e480a4d36e680cb5d9b711c892ffcf5c57d0c2eea0a01f2ea842849fd1e756cee37f40bf934ec529f27072cd#npm:8.7.0"]\
           ],\
           "linkType": "SOFT"\
         }]\
@@ -874,6 +878,18 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["@types/koa-websocket", [\
+        ["npm:5.0.7", {\
+          "packageLocation": "./.yarn/cache/@types-koa-websocket-npm-5.0.7-b64fb191db-d3824c6340.zip/node_modules/@types/koa-websocket/",\
+          "packageDependencies": [\
+            ["@types/koa-websocket", "npm:5.0.7"],\
+            ["@types/koa", "npm:2.13.4"],\
+            ["@types/koa-compose", "npm:3.2.5"],\
+            ["@types/ws", "npm:8.5.3"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["@types/koa__router", [\
         ["npm:8.0.11", {\
           "packageLocation": "./.yarn/cache/@types-koa__router-npm-8.0.11-08ca25f7c2-81f55ed772.zip/node_modules/@types/koa__router/",\
@@ -1014,6 +1030,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/whatwg-url", "npm:8.2.1"],\
             ["@types/node", "npm:17.0.25"],\
             ["@types/webidl-conversions", "npm:6.1.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@types/ws", [\
+        ["npm:8.5.3", {\
+          "packageLocation": "./.yarn/cache/@types-ws-npm-8.5.3-ae52c483f1-0ce46f850d.zip/node_modules/@types/ws/",\
+          "packageDependencies": [\
+            ["@types/ws", "npm:8.5.3"],\
+            ["@types/node", "npm:17.0.25"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -4164,6 +4190,19 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["koa-websocket", [\
+        ["npm:7.0.0", {\
+          "packageLocation": "./.yarn/cache/koa-websocket-npm-7.0.0-2e76bd341a-d8ab3d48b2.zip/node_modules/koa-websocket/",\
+          "packageDependencies": [\
+            ["koa-websocket", "npm:7.0.0"],\
+            ["co", "npm:4.6.0"],\
+            ["debug", "virtual:a2816a45c113d11314f92db1bc6481eb50e649f7827d2b17ecde857618382034e49b50fce2e122bdaa7af4cf40d90adf59db6e8444e8253abee60dfa9cfda5b0#npm:4.3.4"],\
+            ["koa-compose", "npm:4.1.0"],\
+            ["ws", "virtual:2e76bd341a54292ea03a86a4ef8c55ccb8cf00c8e480a4d36e680cb5d9b711c892ffcf5c57d0c2eea0a01f2ea842849fd1e756cee37f40bf934ec529f27072cd#npm:8.7.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["levn", [\
         ["npm:0.4.1", {\
           "packageLocation": "./.yarn/cache/levn-npm-0.4.1-d183b2d7bb-12c5021c85.zip/node_modules/levn/",\
@@ -5211,11 +5250,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/koa", "npm:2.13.4"],\
             ["@types/koa-bodyparser", "npm:4.3.7"],\
             ["@types/koa-cors", "npm:0.0.2"],\
+            ["@types/koa-websocket", "npm:5.0.7"],\
             ["@types/koa__router", "npm:8.0.11"],\
             ["@types/mocha", "npm:9.1.1"],\
             ["@types/node", "npm:17.0.25"],\
             ["@types/sinon", "npm:10.0.11"],\
             ["@types/supertest", "npm:2.0.12"],\
+            ["@types/ws", "npm:8.5.3"],\
             ["@typescript-eslint/eslint-plugin", "virtual:3f21ca9c8a3e63ea383a746855cfaf47b3034c621a23173fe87a8eaf7a65cd6ff9bf1137241c8ddb28e6e85bad7cd29945d90eaeda5d23da0057669986a44e5a#npm:5.20.0"],\
             ["@typescript-eslint/parser", "virtual:3f21ca9c8a3e63ea383a746855cfaf47b3034c621a23173fe87a8eaf7a65cd6ff9bf1137241c8ddb28e6e85bad7cd29945d90eaeda5d23da0057669986a44e5a#npm:5.20.0"],\
             ["bcryptjs", "npm:2.4.3"],\
@@ -5230,6 +5271,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["koa-bodyparser", "npm:4.3.0"],\
             ["koa-cors", "npm:0.0.16"],\
             ["koa-create-context", "virtual:3f21ca9c8a3e63ea383a746855cfaf47b3034c621a23173fe87a8eaf7a65cd6ff9bf1137241c8ddb28e6e85bad7cd29945d90eaeda5d23da0057669986a44e5a#npm:1.0.2"],\
+            ["koa-websocket", "npm:7.0.0"],\
             ["mocha", "npm:9.2.2"],\
             ["mongoose", "npm:6.3.1"],\
             ["nyc", "npm:15.1.0"],\
@@ -5241,7 +5283,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["ts-node", "virtual:3f21ca9c8a3e63ea383a746855cfaf47b3034c621a23173fe87a8eaf7a65cd6ff9bf1137241c8ddb28e6e85bad7cd29945d90eaeda5d23da0057669986a44e5a#npm:10.7.0"],\
             ["ts-node-dev", "virtual:3f21ca9c8a3e63ea383a746855cfaf47b3034c621a23173fe87a8eaf7a65cd6ff9bf1137241c8ddb28e6e85bad7cd29945d90eaeda5d23da0057669986a44e5a#npm:1.1.8"],\
             ["tslib", "npm:2.4.0"],\
-            ["typescript", "patch:typescript@npm%3A4.6.3#~builtin<compat/typescript>::version=4.6.3&hash=bda367"]\
+            ["typescript", "patch:typescript@npm%3A4.6.3#~builtin<compat/typescript>::version=4.6.3&hash=bda367"],\
+            ["ws", "virtual:2e76bd341a54292ea03a86a4ef8c55ccb8cf00c8e480a4d36e680cb5d9b711c892ffcf5c57d0c2eea0a01f2ea842849fd1e756cee37f40bf934ec529f27072cd#npm:8.7.0"]\
           ],\
           "linkType": "SOFT"\
         }]\
@@ -6468,6 +6511,32 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["is-typedarray", "npm:1.0.0"],\
             ["signal-exit", "npm:3.0.7"],\
             ["typedarray-to-buffer", "npm:3.1.5"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["ws", [\
+        ["npm:8.7.0", {\
+          "packageLocation": "./.yarn/cache/ws-npm-8.7.0-880cfc8423-078fa2dbc0.zip/node_modules/ws/",\
+          "packageDependencies": [\
+            ["ws", "npm:8.7.0"]\
+          ],\
+          "linkType": "SOFT"\
+        }],\
+        ["virtual:2e76bd341a54292ea03a86a4ef8c55ccb8cf00c8e480a4d36e680cb5d9b711c892ffcf5c57d0c2eea0a01f2ea842849fd1e756cee37f40bf934ec529f27072cd#npm:8.7.0", {\
+          "packageLocation": "./.yarn/__virtual__/ws-virtual-40f0344dd4/0/cache/ws-npm-8.7.0-880cfc8423-078fa2dbc0.zip/node_modules/ws/",\
+          "packageDependencies": [\
+            ["ws", "virtual:2e76bd341a54292ea03a86a4ef8c55ccb8cf00c8e480a4d36e680cb5d9b711c892ffcf5c57d0c2eea0a01f2ea842849fd1e756cee37f40bf934ec529f27072cd#npm:8.7.0"],\
+            ["@types/bufferutil", null],\
+            ["@types/utf-8-validate", null],\
+            ["bufferutil", null],\
+            ["utf-8-validate", null]\
+          ],\
+          "packagePeers": [\
+            "@types/bufferutil",\
+            "@types/utf-8-validate",\
+            "bufferutil",\
+            "utf-8-validate"\
           ],\
           "linkType": "HARD"\
         }]\

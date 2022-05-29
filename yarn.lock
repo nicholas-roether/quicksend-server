@@ -676,6 +676,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/koa-websocket@npm:^5.0.7":
+  version: 5.0.7
+  resolution: "@types/koa-websocket@npm:5.0.7"
+  dependencies:
+    "@types/koa": "*"
+    "@types/koa-compose": "*"
+    "@types/ws": "*"
+  checksum: d3824c6340bb1181b1507c68e0a2811534a8171da8f262f6d0a5613b033a41e8507524bb45c51514fb168857f64ca70c696f50dd556547a89473737ef9760b73
+  languageName: node
+  linkType: hard
+
 "@types/koa@npm:*, @types/koa@npm:^2.13.4":
   version: 2.13.4
   resolution: "@types/koa@npm:2.13.4"
@@ -809,6 +820,15 @@ __metadata:
     "@types/node": "*"
     "@types/webidl-conversions": "*"
   checksum: 975987a9ca14a8d5a883523acb4fa0df7760cd8ca8dee56cd57753821e56060bfbead94df84f4504fe0b4270776d81cbb40fcd1f8643dab86da3a9abe926fb5c
+  languageName: node
+  linkType: hard
+
+"@types/ws@npm:*, @types/ws@npm:^8.5.3":
+  version: 8.5.3
+  resolution: "@types/ws@npm:8.5.3"
+  dependencies:
+    "@types/node": "*"
+  checksum: 0ce46f850d41383fcdc2149bcacc86d7232fa7a233f903d2246dff86e31701a02f8566f40af5f8b56d1834779255c04ec6ec78660fe0f9b2a69cf3d71937e4ae
   languageName: node
   linkType: hard
 
@@ -1678,7 +1698,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"debug@npm:4, debug@npm:4.x, debug@npm:^4.1.0, debug@npm:^4.1.1, debug@npm:^4.3.2, debug@npm:^4.3.3":
+"debug@npm:4, debug@npm:4.x, debug@npm:^4.1.0, debug@npm:^4.1.1, debug@npm:^4.3.2, debug@npm:^4.3.3, debug@npm:^4.3.4":
   version: 4.3.4
   resolution: "debug@npm:4.3.4"
   dependencies:
@@ -3399,6 +3419,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"koa-websocket@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "koa-websocket@npm:7.0.0"
+  dependencies:
+    co: ^4.6.0
+    debug: ^4.3.4
+    koa-compose: ^4.1.0
+    ws: ^8.5.0
+  checksum: d8ab3d48b2b7863b4272d543e47358192492b9aa71c294b70fe6c232d3d11743d1a7d5e8a7410d286ef18cee101d28eb37a401dbce0b91ba6d7cf034b1541673
+  languageName: node
+  linkType: hard
+
 "koa@npm:^2.13.4":
   version: 2.13.4
   resolution: "koa@npm:2.13.4"
@@ -4377,11 +4409,13 @@ __metadata:
     "@types/koa": ^2.13.4
     "@types/koa-bodyparser": ^4.3.7
     "@types/koa-cors": ^0.0.2
+    "@types/koa-websocket": ^5.0.7
     "@types/koa__router": ^8.0.11
     "@types/mocha": ^9.1.1
     "@types/node": ^17.0.25
     "@types/sinon": ^10.0.11
     "@types/supertest": ^2.0.12
+    "@types/ws": ^8.5.3
     "@typescript-eslint/eslint-plugin": ^5.20.0
     "@typescript-eslint/parser": ^5.20.0
     bcryptjs: ^2.4.3
@@ -4396,6 +4430,7 @@ __metadata:
     koa-bodyparser: ^4.3.0
     koa-cors: ^0.0.16
     koa-create-context: ^1.0.2
+    koa-websocket: ^7.0.0
     mocha: ^9.2.2
     mongoose: ^6.3.1
     nyc: ^15.1.0
@@ -4408,6 +4443,7 @@ __metadata:
     ts-node-dev: ^1.1.8
     tslib: ^2.4.0
     typescript: ^4.6.3
+    ws: ^8.7.0
   languageName: unknown
   linkType: soft
 
@@ -5496,6 +5532,21 @@ __metadata:
     signal-exit: ^3.0.2
     typedarray-to-buffer: ^3.1.5
   checksum: c55b24617cc61c3a4379f425fc62a386cc51916a9b9d993f39734d005a09d5a4bb748bc251f1304e7abd71d0a26d339996c275955f527a131b1dcded67878280
+  languageName: node
+  linkType: hard
+
+"ws@npm:^8.5.0, ws@npm:^8.7.0":
+  version: 8.7.0
+  resolution: "ws@npm:8.7.0"
+  peerDependencies:
+    bufferutil: ^4.0.1
+    utf-8-validate: ^5.0.2
+  peerDependenciesMeta:
+    bufferutil:
+      optional: true
+    utf-8-validate:
+      optional: true
+  checksum: 078fa2dbc06b31a45e0057b19e2930d26c222622e355955afe019c9b9b25f62eb2a8eff7cceabdad04910ecd2bd6ef4fa48e6f3673f2fdddff02a6e4c2459584
   languageName: node
   linkType: hard
 
