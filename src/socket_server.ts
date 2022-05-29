@@ -33,7 +33,7 @@ class SocketServer extends EventEmitter {
 		return async (ctx, next) => {
 			const userId = this.authenticate(ctx);
 			if (!userId) return next();
-			this.subsribeSocket(ctx.state.user.id, ctx.websocket);
+			this.subsribeSocket(userId, ctx.websocket);
 			return next();
 		};
 	}
