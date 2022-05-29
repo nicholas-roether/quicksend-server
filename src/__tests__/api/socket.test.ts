@@ -5,6 +5,7 @@ import UserModel from "src/db/models/user";
 import { User } from "src/db/schemas/user";
 import socketServer from "src/socket_server";
 import supertest from "supertest";
+import { createMongooseConnection } from "../__utils__/mongoose";
 import { generateTestKeys } from "../__utils__/rsa";
 import { createTestServer } from "../__utils__/server";
 import { createSigner, Signer } from "../__utils__/signature";
@@ -12,6 +13,8 @@ import { createSigner, Signer } from "../__utils__/signature";
 const _socketServerGrantToken = socketServer.grantToken;
 
 describe("GET /socket", () => {
+	createMongooseConnection();
+
 	let request: supertest.SuperTest<supertest.Test>;
 
 	before(() => {
