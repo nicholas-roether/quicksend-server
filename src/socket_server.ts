@@ -69,22 +69,25 @@ class SocketServer extends EventEmitter {
 
 	private async authenticate(ctx: SocketContext): Promise<ObjectId | null> {
 		return await new Promise((res) => {
+			let authenticated = false;
 			const authListener = (data: ws.RawData) => {
 				ctx.websocket.removeListener("message", authListener);
 				const userId = this.tokenMap.get(data.toString("base64"));
 				if (!userId) {
-					this.error(ctx, 401, "Invalid auth token");
+					this.error(ctx, 3002, "Invalid auth token");
 					res(null);
 					return;
 				}
+				authenticated = true;
 				res(userId);
 			};
 			ctx.websocket.on("message", authListener);
 			setTimeout(() => {
+				if (authenticated) return;
 				ctx.websocket.removeListener("message", authListener);
 				this.error(
 					ctx,
-					400,
+					3001,
 					"Must provide authentication token within 5 seconds of connection"
 				);
 			}, 5000);
