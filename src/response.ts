@@ -5,7 +5,7 @@ const serializers: Record<string, (obj: unknown) => string> = {
 	json: (obj) => JSON.stringify(obj)
 };
 
-function handleCharset(ctx: Koa.Context): boolean {
+function handleCharset(ctx: Koa.ParameterizedContext): boolean {
 	const acceptHeader = ctx.get("Accept");
 	if (!acceptHeader) return true;
 	const [accept, param] = acceptHeader.split(";");
@@ -23,7 +23,7 @@ function handleCharset(ctx: Koa.Context): boolean {
 	return true;
 }
 
-function getFormat(ctx: Koa.Context): string | null {
+function getFormat(ctx: Koa.ParameterizedContext): string | null {
 	const format = ctx.accepts(...Object.keys(serializers));
 	if (!format) {
 		ctx.status = 406;
@@ -33,7 +33,7 @@ function getFormat(ctx: Koa.Context): string | null {
 	return format;
 }
 
-function serializeResponse(ctx: Koa.Context, format: string) {
+function serializeResponse(ctx: Koa.ParameterizedContext, format: string) {
 	let resObj: ResponseObject | null = null;
 	if (ctx.state.error) resObj = { error: String(ctx.body) };
 	else resObj = { data: ctx.body };

@@ -5,7 +5,7 @@ import { SinonSpy, spy } from "sinon";
 import { expect } from "chai";
 
 describe("the errorHandler() middleware", () => {
-	let ctx: Koa.Context;
+	let ctx: Koa.ParameterizedContext;
 	let next: SinonSpy;
 
 	beforeEach(() => {

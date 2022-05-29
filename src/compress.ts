@@ -1,7 +1,7 @@
 import zlib from "zlib";
 import Koa from "koa";
 
-function decompressRequests(ctx: Koa.Context) {
+function decompressRequests(ctx: Koa.ParameterizedContext) {
 	const encodingHeader = ctx.get("Content-Encoding");
 	if (!encodingHeader) return;
 	const encodings = encodingHeader.replace(/ /g, "").split(",");
@@ -24,7 +24,10 @@ function decompressRequests(ctx: Koa.Context) {
 	ctx.request.body = body.toString();
 }
 
-function acceptsEncoding(ctx: Koa.Context, encoding: string): boolean {
+function acceptsEncoding(
+	ctx: Koa.ParameterizedContext,
+	encoding: string
+): boolean {
 	const aeHeader = ctx.get("Accept-Encoding");
 	if (!aeHeader) return true;
 	const options = aeHeader.replace(/ /g, "").split(",");
@@ -35,7 +38,7 @@ function acceptsEncoding(ctx: Koa.Context, encoding: string): boolean {
 	return false;
 }
 
-function compressResponse(ctx: Koa.Context) {
+function compressResponse(ctx: Koa.ParameterizedContext) {
 	if (!ctx.body || !ctx.state.compress) return;
 	if (!acceptsEncoding(ctx, "gzip")) return;
 

@@ -5,7 +5,7 @@ import response from "src/response";
 import { mockContext } from "./__utils__/koa_mock";
 
 describe("the response() middleware", () => {
-	let ctx: Koa.Context;
+	let ctx: Koa.ParameterizedContext;
 	let next: SinonSpy;
 
 	beforeEach(() => {

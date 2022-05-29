@@ -19,7 +19,7 @@ interface UserData {
 }
 
 async function authenticateBasic(
-	ctx: Koa.Context,
+	ctx: Koa.ParameterizedContext,
 	req: BasicAuthorizationRequest
 ) {
 	const { username, password } = req;
@@ -34,7 +34,10 @@ async function authenticateBasic(
 	} as UserData;
 }
 
-function createSignatureString(ctx: Koa.Context, headers: string[]) {
+function createSignatureString(
+	ctx: Koa.ParameterizedContext,
+	headers: string[]
+) {
 	let signatureStr = "";
 	for (const header of headers) {
 		let value: string;
@@ -54,7 +57,7 @@ function createSignatureString(ctx: Koa.Context, headers: string[]) {
 const signatureRequiredHeaders = ["(request-target)", "x-date"];
 
 async function authenticateSignature(
-	ctx: Koa.Context,
+	ctx: Koa.ParameterizedContext,
 	req: SignatureAuthorizationRequest
 ) {
 	const headers = req.headers ?? ["date"];

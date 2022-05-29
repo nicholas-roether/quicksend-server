@@ -21,7 +21,7 @@ function mockContext(): MockContext {
 
 async function catchMiddlewareErrors(
 	middleware: Koa.Middleware,
-	ctx: Koa.Context,
+	ctx: Koa.ParameterizedContext,
 	next: Koa.Next
 ) {
 	try {
