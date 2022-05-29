@@ -1,8 +1,9 @@
 import Koa from "koa";
 import ws from "ws";
-import { ObjectId } from "./control/types";
+import { ID, ObjectId } from "./control/types";
 import crypto from "crypto";
 import EventEmitter from "events";
+import { idToString } from "./control/utils";
 
 type SocketContext = Koa.ParameterizedContext<
 	Koa.DefaultState,
@@ -28,18 +29,11 @@ class SocketServer extends EventEmitter {
 
 	private readonly tokenMap = new Map<string, ObjectId>();
 
-	constructor() {
-		super();
-		setInterval(() => {
-			this.emitEvent("test");
-		}, 5000);
-	}
-
 	handler(): Koa.Middleware<Koa.DefaultState, SocketContext> {
 		return async (ctx, next) => {
 			const userId = this.authenticate(ctx);
 			if (!userId) return next();
-			this.subsribeSocket(ctx.websocket);
+			this.subsribeSocket(ctx.state.user.id, ctx.websocket);
 			return next();
 		};
 	}
@@ -51,17 +45,17 @@ class SocketServer extends EventEmitter {
 		return token;
 	}
 
-	emitEvent(name: string, data?: unknown) {
-		this.emit("broadcast", new BroadcastEvent(name, data));
+	emitEvent(user: ID, name: string, data?: unknown) {
+		this.emit(idToString(user), new BroadcastEvent(name, data));
 	}
 
-	private subsribeSocket(socket: ws.WebSocket) {
+	private subsribeSocket(user: ObjectId, socket: ws.WebSocket) {
 		const listener = (evt: BroadcastEvent) => {
 			socket.send(evt.toJSON());
 		};
-		this.on("broadcast", listener);
+		this.on(user.toHexString(), listener);
 		socket.on("close", () => {
-			this.removeListener("broadcast", listener);
+			this.removeListener(user.toHexString(), listener);
 		});
 	}
 

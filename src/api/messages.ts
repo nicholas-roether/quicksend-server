@@ -8,6 +8,7 @@ import messageManager, { MessageToDevice } from "src/control/message_manager";
 import { ID, ObjectId } from "src/control/types";
 import userManager from "src/control/user_manager";
 import { isValidID } from "src/control/utils";
+import socketServer from "src/socket_server";
 import { arrayDiff, mapObject, mapToRecord } from "src/utils";
 
 const messages = new Router({ prefix: "/messages" });
@@ -89,6 +90,8 @@ messages.post("/send", bodyValidator(sendMessageSchema), async (ctx, next) => {
 		iv: Buffer.from(iv, "base64"),
 		body: Buffer.from(body, "base64")
 	});
+
+	socketServer.emitEvent(to, "message", { from: userData.id.toHexString() });
 
 	ctx.status = 201;
 	return next();
