@@ -18,7 +18,7 @@ app
 	.use(compress())
 	.use(bodyParser())
 	.use(responseHandler())
-	.use(errorHandler)
+	.use(errorHandler())
 	.use(user.routes())
 	.use(user.allowedMethods())
 	.use(devices.routes())
