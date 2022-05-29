@@ -13,27 +13,20 @@ import socket from "./api/socket";
 
 const app = websockify(new Koa());
 
-const middleware = [
-	cors(),
-	compress(),
-	bodyParser(),
-	responseHandler(),
-	errorHandler(),
-	user.routes(),
-	user.allowedMethods(),
-	devices.routes(),
-	devices.allowedMethods(),
-	messages.routes(),
-	messages.allowedMethods(),
-	socket.routes(),
-	socket.allowedMethods()
-];
-
-function applyMiddleware(app: Koa) {
-	middleware.forEach((mw) => app.use(mw));
-}
-
-applyMiddleware(app);
+app
+	.use(cors())
+	.use(compress())
+	.use(bodyParser())
+	.use(responseHandler())
+	.use(errorHandler)
+	.use(user.routes())
+	.use(user.allowedMethods())
+	.use(devices.routes())
+	.use(devices.allowedMethods())
+	.use(messages.routes())
+	.use(messages.allowedMethods())
+	.use(socket.routes())
+	.use(socket.allowedMethods());
 
 app.ws.use(socketServer.handler());
 
