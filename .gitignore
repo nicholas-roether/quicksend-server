@@ -7,5 +7,5 @@
 node_modules
 
 dist
-.env.local
+.env
 .nyc_output
