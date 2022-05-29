@@ -20,13 +20,13 @@ describe("POST /user/create", function () {
 	});
 
 	it("should abort with 400 response if username is missing", async () => {
-		request.post("/user/create").send({ password: "1234" }).expect(400);
+		await request.post("/user/create").send({ password: "1234" }).expect(400);
 		const users = await UserModel.find().exec();
 		expect(users.length).to.equal(0);
 	});
 
 	it("should abort with 400 response if password is missing", async () => {
-		request.post("/user/create").send({ username: "1234" }).expect(400);
+		await request.post("/user/create").send({ username: "1234" }).expect(400);
 		const users = await UserModel.find().exec();
 		expect(users.length).to.equal(0);
 	});
