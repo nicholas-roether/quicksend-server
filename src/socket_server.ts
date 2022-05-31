@@ -57,6 +57,9 @@ class SocketServer extends EventEmitter {
 		socket.on("close", () => {
 			this.removeListener(user.toHexString(), listener);
 		});
+		socket.on("error", () => {
+			socket.close();
+		});
 	}
 
 	private revokeToken(token: string) {
