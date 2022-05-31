@@ -766,6 +766,7 @@ describe("GET /messages/poll", () => {
 			expect(res.body).to.deep.equal({
 				data: [
 					{
+						id: testMsg1._id.toHexString(),
 						chat: sender.toHexString(),
 						incoming: true,
 						sentAt: testMsg1.sentAt.toISOString(),
@@ -777,6 +778,7 @@ describe("GET /messages/poll", () => {
 						body: encodeBase64("Hi there!")
 					},
 					{
+						id: testMsg2._id.toHexString(),
 						chat: sender.toHexString(),
 						incoming: false,
 						sentAt: testMsg2.sentAt.toISOString(),
@@ -825,6 +827,7 @@ describe("GET /messages/poll", () => {
 			expect(res.body).to.deep.equal({
 				data: [
 					{
+						id: testMsg1._id.toHexString(),
 						chat: sender.toHexString(),
 						incoming: true,
 						sentAt: testMsg1.sentAt.toISOString(),

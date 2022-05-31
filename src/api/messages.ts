@@ -105,6 +105,7 @@ messages.get("/poll", async (ctx, next) => {
 	ctx.body = messageCtrs.map((messageCtr: Accessor<MessageToDevice>) => {
 		const incoming = userId.equals(messageCtr.get("toUser"));
 		return {
+			id: messageCtr.id.toHexString(),
 			chat: incoming ? messageCtr.get("fromUser") : messageCtr.get("toUser"),
 			incoming,
 			sentAt: messageCtr.get("sentAt").toISOString(),
