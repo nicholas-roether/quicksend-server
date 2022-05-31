@@ -408,7 +408,7 @@ describe("POST /messages/send", async () => {
 			await testDevice2.save();
 
 			const date = new Date();
-			await sign(request.post("/messages/send"))
+			const res = await sign(request.post("/messages/send"))
 				.send({
 					to: testUser._id.toHexString(),
 					sentAt: date.toISOString(),
@@ -432,6 +432,7 @@ describe("POST /messages/send", async () => {
 			expect(message.sentAt.getTime()).to.equal(date.getTime());
 			expect(message.headers.size).to.equal(0);
 			expect(message.body.toString()).to.equal("Hello World");
+			expect(res.body.data.id).to.equal(message._id.toHexString());
 		});
 
 		it("should respond with 400 to requests that don't specify a bodies field", async () => {
@@ -474,7 +475,7 @@ describe("POST /messages/send", async () => {
 			await testDevice2.save();
 
 			const date = new Date();
-			await sign(request.post("/messages/send"))
+			const res = await sign(request.post("/messages/send"))
 				.send({
 					to: testUser._id.toHexString(),
 					sentAt: date.toISOString(),
@@ -502,6 +503,7 @@ describe("POST /messages/send", async () => {
 			expect(message.headers.size).to.equal(1);
 			expect(message.headers.get("type")).to.equal("text/plain");
 			expect(message.body.toString()).to.equal("Hello World");
+			expect(res.body.data.id).to.equal(message._id.toHexString());
 		});
 
 		it("should save correctly formed messages to others to the database", async () => {
@@ -519,7 +521,7 @@ describe("POST /messages/send", async () => {
 			await someDevice.save();
 
 			const date = new Date();
-			await sign(request.post("/messages/send"))
+			const res = await sign(request.post("/messages/send"))
 				.send({
 					to: otherUser._id.toHexString(),
 					sentAt: date.toISOString(),
@@ -547,6 +549,7 @@ describe("POST /messages/send", async () => {
 			expect(message.headers.size).to.equal(1);
 			expect(message.headers.get("type")).to.equal("text/plain");
 			expect(message.body.toString()).to.equal("Hello World");
+			expect(res.body.data.id).to.equal(message._id.toHexString());
 		});
 
 		it("should save correctly formed messages to others and other devices of the same user", async () => {
@@ -572,7 +575,7 @@ describe("POST /messages/send", async () => {
 			await someDevice.save();
 
 			const date = new Date();
-			await sign(request.post("/messages/send"))
+			const res = await sign(request.post("/messages/send"))
 				.send({
 					to: otherUser._id.toHexString(),
 					sentAt: date.toISOString(),
@@ -605,6 +608,7 @@ describe("POST /messages/send", async () => {
 			expect(message.headers.size).to.equal(1);
 			expect(message.headers.get("type")).to.equal("text/plain");
 			expect(message.body.toString()).to.equal("Hello! :)");
+			expect(res.body.data.id).to.equal(message.id);
 		});
 
 		it("should return 400 for requests that are missing a device of the target user", async () => {

@@ -81,7 +81,7 @@ messages.post("/send", bodyValidator(sendMessageSchema), async (ctx, next) => {
 	if (idDiff.extra.length > 0)
 		return ctx.throw(400, "Extraneous unknown device(s)");
 
-	await messageManager.create({
+	const messageCtr = await messageManager.create({
 		fromUser: userData.id,
 		toUser: to,
 		sentAt: new Date(sentAt),
@@ -94,6 +94,7 @@ messages.post("/send", bodyValidator(sendMessageSchema), async (ctx, next) => {
 	socketServer.emitEvent(to, "message", { from: userData.id.toHexString() });
 
 	ctx.status = 201;
+	ctx.body = { id: messageCtr.id };
 	return next();
 });
 
