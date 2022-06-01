@@ -1,46 +1,27 @@
 import "./config";
 import fs from "fs";
-import http from "http";
-import https from "https";
 import Koa from "koa";
-import mongoose from "mongoose";
-import { requireEnvVar } from "./utils";
+import createApp from "./app";
 
 class Server {
-	private readonly httpServer: http.Server;
+	private readonly app: Koa;
 
-	constructor(httpServer: http.Server) {
-		this.httpServer = httpServer;
+	constructor(app: Koa) {
+		this.app = app;
 	}
 
 	listen() {
-		this.httpServer.listen(process.env.PORT);
+		const server = this.app.listen(process.env.PORT);
 
-		const address = this.httpServer.address();
+		const address = server.address();
 		if (!address) {
 			console.error("An unexpected error occurred while starting the server");
-			this.httpServer.close();
+			server.close();
 		} else if (typeof address == "string") {
 			console.log(`Listening on ${address}...`);
 		} else {
-			console.log(`Listening on port ${address.port} (${address.address})...`);
+			console.log(`Listening on port ${address.port} (${address.address})`);
 		}
-
-		mongoose
-			.connect(requireEnvVar("DB_URI"))
-			.then(() => console.log("Database connected"));
-	}
-}
-
-class HttpServer extends Server {
-	constructor(app: Koa) {
-		super(http.createServer(app.callback()));
-	}
-}
-
-class HttpsServer extends Server {
-	constructor(certData: HttpsCertData, app: Koa) {
-		super(https.createServer(certData, app.callback()));
 	}
 }
 
@@ -60,16 +41,16 @@ function loadHttpsCert(): HttpsCertData | null {
 	};
 }
 
-function createServer(app: Koa): Server {
+function createServer(): Server {
 	const httpsCert = loadHttpsCert();
 	if (!httpsCert) {
 		console.warn(
 			"No HTTPS configuration found; Starting in HTTP mode. HTTP mode servers are INSECURE, and should ONLY be used for testing."
 		);
-		return new HttpServer(app);
+		return new Server(createApp());
 	}
 	console.log("Starting in HTTPS mode.");
-	return new HttpsServer(httpsCert, app);
+	return new Server(createApp(httpsCert));
 }
 
 export default createServer;
