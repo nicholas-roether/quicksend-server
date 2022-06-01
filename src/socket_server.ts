@@ -59,6 +59,7 @@ class SocketServer extends EventEmitter {
 		});
 		socket.on("error", () => {
 			socket.close();
+			this.removeListener(user.toHexString(), listener);
 		});
 	}
 
