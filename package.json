@@ -66,5 +66,8 @@
 	},
 	"resolutions": {
 		"node-preload": "0.2.0"
+	},
+	"engines": {
+		"yarn": "3.x"
 	}
 }
