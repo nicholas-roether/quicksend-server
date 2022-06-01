@@ -7,7 +7,7 @@ import deviceManager from "src/control/device_manager";
 import messageManager, { MessageToDevice } from "src/control/message_manager";
 import { ID, ObjectId } from "src/control/types";
 import userManager from "src/control/user_manager";
-import { isValidID } from "src/control/utils";
+import { idToString, isValidID } from "src/control/utils";
 import socketServer from "src/socket_server";
 import { arrayDiff, mapObject, mapToRecord } from "src/utils";
 
@@ -91,6 +91,10 @@ messages.post("/send", bodyValidator(sendMessageSchema), async (ctx, next) => {
 		body: Buffer.from(body, "base64")
 	});
 
+	socketServer.emitEvent(userData.id, "message", {
+		from: userData.id.toHexString(),
+		fromDevice: idToString(ctx.state.device)
+	});
 	socketServer.emitEvent(to, "message", { from: userData.id.toHexString() });
 
 	ctx.status = 201;
