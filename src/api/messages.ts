@@ -64,9 +64,14 @@ messages.post("/send", bodyValidator(sendMessageSchema), async (ctx, next) => {
 
 	const sentAtDate = new Date(sentAt);
 	const messageAge = Date.now() - sentAtDate.getTime();
-	if (messageAge < 0)
-		return ctx.throw(400, "Cannot send messages from the future");
-	if (messageAge > MESSAGE_AGE_LIMIT) return ctx.throw(400, "Message too old");
+	if (messageAge < 0) {
+		return ctx.throw(
+			400,
+			`Cannot send messages from the future (message age was ${messageAge})`
+		);
+	}
+	if (messageAge > MESSAGE_AGE_LIMIT)
+		return ctx.throw(400, `Message too old (message age was ${messageAge})`);
 
 	const targets = await deviceManager.findMessageTargets(
 		to,
