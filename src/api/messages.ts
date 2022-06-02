@@ -117,6 +117,7 @@ messages.get("/poll", async (ctx, next) => {
 	const userId = ctx.state.user.id as ObjectId;
 	const messageCtrs = await messageManager.poll(deviceId);
 
+	ctx.state.compress = true;
 	ctx.body = messageCtrs.map((messageCtr: Accessor<MessageToDevice>) => {
 		const incoming = userId.equals(messageCtr.get("toUser"));
 		return {
