@@ -29,7 +29,7 @@ function acceptsEncoding(
 	encoding: string
 ): boolean {
 	const aeHeader = ctx.get("Accept-Encoding");
-	if (!aeHeader) return true;
+	if (!aeHeader) return false;
 	const options = aeHeader.replace(/ /g, "").split(",");
 	for (const option of options) {
 		const [encName] = option.split(";");
