@@ -1,6 +1,6 @@
 {
 	"name": "quicksend-server",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "The server for the mobile messaging app quicksend",
 	"main": "src/server.ts",
 	"repository": "https://github.com/nicholas-roether/quicksend-server.git",
