@@ -12,7 +12,7 @@ import socketServer from "./socket_server";
 import socket from "./api/socket";
 import { ServerOptions } from "https";
 
-function createApp(httpsOptions: ServerOptions = {}): Koa {
+function createApp(httpsOptions: ServerOptions | undefined = undefined): Koa {
 	const app = websockify(new Koa(), {}, httpsOptions);
 
 	app
