@@ -53,6 +53,7 @@ const sendMessageSchema = Joi.object<SendMessageRequest>({
 });
 
 const MESSAGE_AGE_LIMIT = 300000; // 5 minutes
+const MESSAGE_TIME_TRAVEL_LIMIT = -2000; // -2 seconds
 
 messages.post("/send", bodyValidator(sendMessageSchema), async (ctx, next) => {
 	const userData = ctx.state.user as UserData;
@@ -64,7 +65,7 @@ messages.post("/send", bodyValidator(sendMessageSchema), async (ctx, next) => {
 
 	const sentAtDate = new Date(sentAt);
 	const messageAge = Date.now() - sentAtDate.getTime();
-	if (messageAge < 0) {
+	if (messageAge < MESSAGE_TIME_TRAVEL_LIMIT) {
 		return ctx.throw(
 			400,
 			`Cannot send messages from the future (message was sent at ${sentAt}, current server time is ${new Date().toISOString()})`
