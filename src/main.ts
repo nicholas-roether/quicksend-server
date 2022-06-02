@@ -8,4 +8,5 @@ server.listen();
 
 mongoose
 	.connect(requireEnvVar("DB_URI"))
-	.then(() => console.log("Database connected"));
+	.then(() => console.log("Database connected"))
+	.catch((err) => console.error("Database connection failed: " + err));
