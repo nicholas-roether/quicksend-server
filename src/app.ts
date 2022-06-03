@@ -11,6 +11,7 @@ import messages from "./api/messages";
 import socketServer from "./socket_server";
 import socket from "./api/socket";
 import { ServerOptions } from "https";
+import asset from "./api/asset";
 
 function createApp(httpsOptions: ServerOptions | undefined = undefined): Koa {
 	const app = websockify(new Koa(), {}, httpsOptions);
@@ -28,7 +29,9 @@ function createApp(httpsOptions: ServerOptions | undefined = undefined): Koa {
 		.use(messages.routes())
 		.use(messages.allowedMethods())
 		.use(socket.routes())
-		.use(socket.allowedMethods());
+		.use(socket.allowedMethods())
+		.use(asset.routes())
+		.use(asset.allowedMethods());
 
 	app.ws.use(socketServer.handler());
 

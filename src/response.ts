@@ -43,12 +43,13 @@ function serializeResponse(ctx: Koa.ParameterizedContext, format: string) {
 
 function responseHandler(): Koa.Middleware {
 	return async (ctx, next) => {
-		if (!handleCharset(ctx)) return;
-		const format = getFormat(ctx);
-		if (!format) return;
+		if (!handleCharset(ctx)) return next();
 
 		await next();
 
+		if (ctx.state.rawResponse) return;
+		const format = getFormat(ctx);
+		if (!format) return;
 		serializeResponse(ctx, format);
 	};
 }
