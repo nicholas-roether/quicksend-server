@@ -6,6 +6,7 @@ function decompressRequests(ctx: Koa.ParameterizedContext) {
 	if (!encodingHeader) return;
 	const encodings = encodingHeader.replace(/ /g, "").split(",");
 	let body: Buffer = Buffer.from(ctx.request.body ?? "");
+	if (body.length == 0) return;
 	for (const encoding of encodings.reverse()) {
 		switch (encoding) {
 			case "gzip":
