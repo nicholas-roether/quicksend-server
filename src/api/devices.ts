@@ -3,6 +3,7 @@ import Joi from "joi";
 import authHandler, { UserData } from "src/auth/handler";
 import bodyValidator from "src/body_validator";
 import deviceManager from "src/control/device_manager";
+import messageManager from "src/control/message_manager";
 import { isValidID } from "src/control/utils";
 
 const devices = new Router({ prefix: "/devices" });
@@ -68,6 +69,7 @@ devices.post(
 		if (!(await deviceManager.idExistsForUser(body.id, userData.id)))
 			return ctx.throw(400, "Device does not exist");
 		await deviceManager.remove(body.id);
+		await messageManager.clear(body.id);
 
 		return next();
 	}
