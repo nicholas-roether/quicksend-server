@@ -54,8 +54,11 @@ class Controller<D extends DBObject> extends Accessor<D> {
 		return this.doc._id;
 	}
 
-	async set<F extends DBObjField<D>>(field: F, val: Doc<D>[F]): Promise<void> {
+	set<F extends DBObjField<D>>(field: F, val: Doc<D>[F]): void {
 		this.doc[field] = val;
+	}
+
+	async update(): Promise<void> {
 		await this.doc.save();
 	}
 

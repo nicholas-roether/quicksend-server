@@ -738,6 +738,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/raw-body@npm:^2.3.0":
+  version: 2.3.0
+  resolution: "@types/raw-body@npm:2.3.0"
+  dependencies:
+    raw-body: "*"
+  checksum: 0bb3f1302a7cfd60a6c8df571b53567277427f5db1a68f8a153d21d2bef67d41152f12beca8edd0091255fe5866b76a65eb273b74a078c79792cf87481087c4a
+  languageName: node
+  linkType: hard
+
 "@types/serve-static@npm:*":
   version: 1.13.10
   resolution: "@types/serve-static@npm:1.13.10"
@@ -4396,6 +4405,7 @@ __metadata:
     "@types/koa__router": ^8.0.11
     "@types/mocha": ^9.1.1
     "@types/node": ^17.0.25
+    "@types/raw-body": ^2.3.0
     "@types/sinon": ^10.0.11
     "@types/supertest": ^2.0.12
     "@types/ws": ^8.5.3
@@ -4417,6 +4427,7 @@ __metadata:
     mongoose: ^6.3.1
     nyc: ^15.1.0
     prettier: ^2.6.2
+    raw-body: ^2.5.1
     sinon: ^13.0.2
     src: "link:./src"
     supertest: ^6.2.2
@@ -4438,7 +4449,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"raw-body@npm:^2.3.3":
+"raw-body@npm:*, raw-body@npm:^2.3.3, raw-body@npm:^2.5.1":
   version: 2.5.1
   resolution: "raw-body@npm:2.5.1"
   dependencies:
