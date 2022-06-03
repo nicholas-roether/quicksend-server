@@ -46,7 +46,9 @@ user.get("/info", authHandler("Signature"), async (ctx, next) => {
 	ctx.body = {
 		id: userData.id.toHexString(),
 		username: userData.username,
-		display: userData.display
+		display: userData.display,
+		profilePicture: userData.profilePicture?.toHexString(),
+		status: userData.status
 	};
 
 	return next();
@@ -64,7 +66,9 @@ user.get("/info/:id", async (ctx, next) => {
 	ctx.body = {
 		id: userCtr.id.toHexString(),
 		username: userCtr.get("username"),
-		display: userCtr.get("display")
+		display: userCtr.get("display"),
+		profilePicture: userCtr.get("profilePicture")?.toHexString(),
+		status: userCtr.get("status")
 	};
 
 	return next();
@@ -81,7 +85,9 @@ user.get("/find/:name", async (ctx, next) => {
 	ctx.body = {
 		id: userCtr.id,
 		username: userCtr.get("username"),
-		display: userCtr.get("display")
+		display: userCtr.get("display"),
+		profilePicture: userCtr.get("profilePicture")?.toHexString(),
+		status: userCtr.get("status")
 	};
 
 	return next();

@@ -11,11 +11,14 @@ import { includesAll } from "src/utils";
 import userManager from "src/control/user_manager";
 import deviceManager from "src/control/device_manager";
 import { isValidID } from "src/control/utils";
+import { ObjectId } from "src/control/types";
 
 interface UserData {
 	id: mongoose.Types.ObjectId;
 	username: string;
 	display?: string;
+	profilePicture?: ObjectId;
+	status?: string;
 }
 
 async function authenticateBasic(
@@ -30,7 +33,9 @@ async function authenticateBasic(
 	ctx.state.user = {
 		id: user.id,
 		username: user.get("username"),
-		display: user.get("display")
+		display: user.get("display"),
+		profilePicture: user.get("profilePicture"),
+		status: user.get("status")
 	} as UserData;
 }
 
@@ -84,7 +89,9 @@ async function authenticateSignature(
 	ctx.state.user = {
 		id: user.id,
 		username: user.get("username"),
-		display: user.get("display")
+		display: user.get("display"),
+		profilePicture: user.get("profilePicture"),
+		status: user.get("status")
 	} as UserData;
 	ctx.state.device = device.id;
 }
