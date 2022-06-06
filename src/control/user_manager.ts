@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import UserModel from "src/db/models/user";
 import { User } from "src/db/schemas/user";
 import Manager from "./manager";
-import { Doc } from "./types";
+import { DBObjField, Doc } from "./types";
 import UserController from "./user_controller";
 
 class UserManager extends Manager<User, UserController> {
@@ -18,9 +18,17 @@ class UserManager extends Manager<User, UserController> {
 	}
 
 	async findUsername(username: string): Promise<UserController | null> {
-		const doc = await this.Model.findOne({ username }).exec();
+		const defined: readonly DBObjField<User>[] = [
+			"username",
+			"display",
+			"profilePicture",
+			"status"
+		];
+		const doc = await this.Model.findOne({ username })
+			.select(defined.join(" "))
+			.exec();
 		if (!doc) return null;
-		return this.createController(doc);
+		return this.createController(doc, defined);
 	}
 
 	async createUser(
@@ -35,8 +43,11 @@ class UserManager extends Manager<User, UserController> {
 		});
 	}
 
-	protected createController(document: Doc<User>): UserController {
-		return new UserController(document);
+	protected createController(
+		document: Doc<User>,
+		defined: readonly DBObjField<User>[]
+	): UserController {
+		return new UserController(document, defined);
 	}
 }
 

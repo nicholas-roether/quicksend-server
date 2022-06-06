@@ -63,7 +63,12 @@ user.get("/info/:id", async (ctx, next) => {
 	const id = ctx.params.id;
 	if (!isValidID(id)) return ctx.throw(400, "Invalid user id");
 
-	const userCtr = await userManager.findID(id, ["username", "display"]);
+	const userCtr = await userManager.findID(id, [
+		"username",
+		"display",
+		"profilePicture",
+		"status"
+	]);
 	if (!userCtr) {
 		ctx.body = null;
 		return next();
