@@ -53,7 +53,7 @@ const sendMessageSchema = Joi.object<SendMessageRequest>({
 });
 
 const MESSAGE_AGE_LIMIT = 300000; // 5 minutes
-const MESSAGE_TIME_TRAVEL_LIMIT = -2000; // -2 seconds
+const MESSAGE_TIME_TRAVEL_LIMIT = -10000; // -10 seconds
 
 messages.post("/send", bodyValidator(sendMessageSchema), async (ctx, next) => {
 	const userData = ctx.state.user as UserData;
