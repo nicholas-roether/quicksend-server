@@ -18,17 +18,9 @@ class UserManager extends Manager<User, UserController> {
 	}
 
 	async findUsername(username: string): Promise<UserController | null> {
-		const defined: readonly DBObjField<User>[] = [
-			"username",
-			"display",
-			"profilePicture",
-			"status"
-		];
-		const doc = await this.Model.findOne({ username })
-			.select(defined.join(" "))
-			.exec();
+		const doc = await this.Model.findOne({ username }).exec();
 		if (!doc) return null;
-		return this.createController(doc, defined);
+		return this.createController(doc);
 	}
 
 	async createUser(
@@ -45,7 +37,7 @@ class UserManager extends Manager<User, UserController> {
 
 	protected createController(
 		document: Doc<User>,
-		defined: readonly DBObjField<User>[]
+		defined?: readonly DBObjField<User>[]
 	): UserController {
 		return new UserController(document, defined);
 	}
