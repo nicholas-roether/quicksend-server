@@ -110,9 +110,9 @@ interface UpdateUserRequest {
 }
 
 const updateUserSchema = Joi.object<UpdateUserRequest>({
-	display: displayNameSchema,
-	password: passwordSchema,
-	status: Joi.string()
+	display: displayNameSchema.optional(),
+	password: passwordSchema.optional(),
+	status: Joi.string().optional()
 });
 
 user.post(
