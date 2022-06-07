@@ -101,7 +101,7 @@ messages.post("/send", bodyValidator(sendMessageSchema), async (ctx, next) => {
 		body: Buffer.from(body, "base64")
 	});
 
-	socketServer.emitEvent(userData.id, "message", {
+	socketServer.emitEvent(userData.id.toHexString(), "message", {
 		from: userData.id.toHexString(),
 		fromDevice: idToString(ctx.state.device)
 	});
