@@ -34,8 +34,6 @@ devices.post(
 
 		const userData = ctx.state.user as UserData;
 
-		if (await deviceManager.nameExistsForUser(body.name, userData.id))
-			return ctx.throw(400, "Device with this name already exists");
 		const deviceCtr = await deviceManager.create({
 			name: body.name,
 			type: body.type,
