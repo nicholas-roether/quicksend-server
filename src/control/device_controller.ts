@@ -18,6 +18,10 @@ class DeviceController extends Controller<Device> {
 			]
 		);
 	}
+
+	setLastActivity(): void {
+		this.set("lastActivity", new Date());
+	}
 }
 
 export default DeviceController;

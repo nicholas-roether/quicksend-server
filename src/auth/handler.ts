@@ -94,6 +94,9 @@ async function authenticateSignature(
 		status: user.get("status")
 	} as UserData;
 	ctx.state.device = device.id;
+
+	device.setLastActivity();
+	await device.update();
 }
 
 type AuthType = "Basic" | "Signature";
