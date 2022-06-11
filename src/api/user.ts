@@ -167,10 +167,10 @@ user.post("/set-pfp", authHandler("Signature"), async (ctx, next) => {
 		mimeType: contentType,
 		data: body
 	});
-	const currentPfp = userCtr.get("profilePicture");
-	if (currentPfp) await assetManager.deleteID(currentPfp);
+	const oldPfp = userCtr.get("profilePicture");
 	userCtr.set("profilePicture", assetCtr.id);
 	await userCtr.update();
+	if (oldPfp) await assetManager.deleteID(oldPfp);
 
 	ctx.body = { id: assetCtr.id.toHexString() };
 	return next();
