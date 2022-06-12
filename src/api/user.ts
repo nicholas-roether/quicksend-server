@@ -106,12 +106,10 @@ user.get("/find/:name", async (ctx, next) => {
 interface UpdateUserRequest {
 	display?: string;
 	status?: string;
-	password?: string;
 }
 
 const updateUserSchema = Joi.object<UpdateUserRequest>({
 	display: displayNameSchema.optional(),
-	password: passwordSchema.optional(),
 	status: Joi.string().optional()
 });
 
@@ -123,17 +121,41 @@ user.post(
 		const userData = ctx.state.user as UserData;
 		const userCtr = await userManager.findID(userData.id);
 		if (!userCtr) {
-			return ctx.throw(
-				400,
-				"Cannot update the logged in user as they no longer exist"
-			);
+			return ctx.throw(500, "User data could no longer be found after login");
 		}
 
 		const body = ctx.request.body as UpdateUserRequest;
 
 		if (body.display) userCtr.set("display", body.display);
-		if (body.password) userCtr.setPassword(body.password);
 		if (body.status) userCtr.set("status", body.status);
+		await userCtr.update();
+
+		return next();
+	}
+);
+
+interface ChangePasswordRequest {
+	newPassword: string;
+}
+
+const changePasswordSchema = Joi.object<ChangePasswordRequest>({
+	newPassword: passwordSchema.required()
+});
+
+user.post(
+	"/change-pwd",
+	authHandler("Basic"),
+	bodyValidator(changePasswordSchema),
+	async (ctx, next) => {
+		const userData = ctx.state.user as UserData;
+		const userCtr = await userManager.findID(userData.id);
+		if (!userCtr) {
+			return ctx.throw(500, "User data could no longer be found after login");
+		}
+
+		const body = ctx.request.body as ChangePasswordRequest;
+
+		userCtr.setPassword(body.newPassword);
 		await userCtr.update();
 
 		return next();
