@@ -18,8 +18,10 @@ interface AddDeviceRequest {
 	encryptionPublicKey: string;
 }
 
+const deviceNameSchema = Joi.string().min(3).max(30);
+
 const addDeviceSchema = Joi.object<AddDeviceRequest>({
-	name: Joi.string().min(3).max(30).required(),
+	name: deviceNameSchema.required(),
 	type: Joi.number().min(0),
 	signaturePublicKey: Joi.string().required(),
 	encryptionPublicKey: Joi.string().required()
@@ -88,5 +90,32 @@ devices.get("/list", authHandler(), async (ctx, next) => {
 	}));
 	return next();
 });
+
+interface DeviceUpdateRequest {
+	id: string;
+	name?: string;
+}
+
+const deviceUpdateSchema = Joi.object<DeviceUpdateRequest>({
+	id: Joi.string().required(),
+	name: deviceNameSchema.optional()
+});
+
+devices.post(
+	"/devices/update",
+	authHandler(),
+	bodyValidator(deviceUpdateSchema),
+	async (ctx, next) => {
+		const userData = ctx.state.user as UserData;
+		const body = ctx.request.body as DeviceUpdateRequest;
+		if (!isValidID(body.id)) return ctx.throw(400, "Not a valid device id");
+		const deviceCtr = await deviceManager.findID(body.id);
+		if (!deviceCtr || !deviceCtr.get("user").equals(userData.id))
+			return ctx.throw(400, "Device does not exist for this user");
+		if (body.name) deviceCtr.set("name", body.name);
+		await deviceCtr.update();
+		return next();
+	}
+);
 
 export default devices;
