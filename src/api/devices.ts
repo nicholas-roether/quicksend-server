@@ -102,7 +102,7 @@ const deviceUpdateSchema = Joi.object<DeviceUpdateRequest>({
 });
 
 devices.post(
-	"/devices/update",
+	"/update",
 	authHandler(),
 	bodyValidator(deviceUpdateSchema),
 	async (ctx, next) => {
