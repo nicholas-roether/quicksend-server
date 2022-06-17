@@ -75,6 +75,12 @@ devices.post(
 	}
 );
 
+devices.post("/remove-current", authHandler(), async (ctx, next) => {
+	await deviceManager.remove(ctx.state.device);
+	await messageManager.clear(ctx.state.device);
+	return next();
+});
+
 devices.get("/list", authHandler(), async (ctx, next) => {
 	const userData = ctx.state.user as UserData;
 
