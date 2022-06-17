@@ -59,7 +59,7 @@ const removeDeviceSchema = Joi.object<RemoveDeviceRequest>({
 
 devices.post(
 	"/remove",
-	authHandler(),
+	authHandler("Basic"),
 	bodyValidator(removeDeviceSchema),
 	async (ctx, next) => {
 		const body = ctx.request.body as RemoveDeviceRequest;
