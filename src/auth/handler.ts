@@ -29,7 +29,7 @@ async function authenticateBasic(
 	const user = await userManager.findUsername(username);
 	if (!user) return ctx.throw(400, "User doesn't exist");
 	if (!bcrypt.compareSync(password, user.get("passwordHash")))
-		return ctx.throw(401, "Invalid credentials");
+		return ctx.throw(401, "Password is incorrect");
 	ctx.state.user = {
 		id: user.id,
 		username: user.get("username"),
