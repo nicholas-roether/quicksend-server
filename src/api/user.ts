@@ -6,6 +6,8 @@ import authHandler, { UserData } from "src/auth/handler";
 import userManager from "src/control/user_manager";
 import { isValidID } from "src/control/utils";
 import assetManager from "src/control/asset_manager";
+import deviceManager from "src/control/device_manager";
+import messageManager from "src/control/message_manager";
 
 const user = new Router({ prefix: "/user" });
 
@@ -196,6 +198,19 @@ user.post("/set-pfp", authHandler("Signature"), async (ctx, next) => {
 
 	ctx.body = { id: assetCtr.id.toHexString() };
 	return next();
+});
+
+user.post("/delete", authHandler("Basic"), async (ctx, next) => {
+	const userCtr = await userManager.findID(ctx.user.id);
+	if (!userCtr) return next();
+	const deviceCtrs = await deviceManager.list(userCtr.id);
+	await Promise.all(
+		deviceCtrs.map(async (deviceCtr) => {
+			await messageManager.clear(deviceCtr.id);
+			await deviceCtr.delete();
+		})
+	);
+	await userCtr.delete();
 });
 
 export default user;
