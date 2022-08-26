@@ -57,7 +57,7 @@
 		"koa": "^2.13.4",
 		"koa-bodyparser": "^4.3.0",
 		"koa-websocket": "^7.0.0",
-		"mongoose": "^6.3.1",
+		"mongoose": "^6.4.6",
 		"raw-body": "^2.5.1",
 		"src": "link:./src",
 		"ts-node": "^10.7.0",
